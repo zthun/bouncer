@@ -62,8 +62,7 @@ jobs:
             export DOCKER_BUILDKIT=1
             docker login -u $DOCKERHUB_USER -p $DOCKERHUB_PASSWORD
             docker buildx create --use
-            docker buildx build --target helpful-web -t zthun/helpful-web:latest -t zthun/helpful-web:$(npm show @zthun/helpful-web version) --progress=plain --platform linux/arm64,linux/amd64 --push .
-            docker buildx build --target helpful-proxy -t zthun/helpful-proxy:latest -t zthun/helpful-proxy:$(npm show @zthun/helpful-proxy version) --progress=plain --platform linux/arm64,linux/amd64 --push .
+            docker buildx build --target bouncer-web -t zthun/bouncer-web:latest -t zthun/bouncer-web:$(npm show @zthun/bouncer-web version) --progress=plain --platform linux/arm64,linux/amd64 --push .
 
 workflows:
   make:
