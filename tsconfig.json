@@ -3,8 +3,7 @@
   "compilerOptions": {
     "baseUrl": "packages",
     "target": "esnext",
-    "paths": {
-    }
+    "paths": {}
   },
   "include": ["**/*.ts", "**/*.mts"]
 }
