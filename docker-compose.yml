@@ -13,9 +13,9 @@ services:
       - bouncer-mongo-admin
       - bouncer-email
   bouncer-mongo:
-    image: mongo:5.0.5
+    image: mongo:noble
   bouncer-mongo-admin:
-    image: mongo-express:0.54.0
+    image: mongo-express:latest
     depends_on:
       - bouncer-mongo
     environment:
