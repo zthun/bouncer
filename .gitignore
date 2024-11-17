@@ -3,6 +3,7 @@ coverage
 reports
 *.lerna_backup
 *.tgz
+.certificates
 
 # Secrets
 .secrets
