@@ -1,0 +1,13 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "extends": ["../../.config/typedoc.json"],
+  "out": "./dist",
+  "categorizeByGroup": true,
+  "entryPointStrategy": "packages",
+  "entryPoints": ["../*"],
+  "exclude": ["./"],
+  "excludeNotDocumented": true,
+  "name": "Bouncer",
+  "plugin": ["typedoc-plugin-extras"],
+  "favicon": "public/images/svg/bouncer.svg"
+}
