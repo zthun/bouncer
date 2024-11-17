@@ -1,0 +1,33 @@
+{
+  "name": "@zthun/bouncer",
+  "version": "1.0.0",
+  "description": "A reverse proxy written in node-js.",
+  "author": "Anthony Bonta",
+  "license": "MIT",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zthun/bouncer",
+    "directory": "packages/bouncer"
+  },
+  "main": "./dist/main.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.prod.json"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "cosmiconfig": "^9.0.0"
+  },
+  "devDependencies": {
+    "typedoc": "^0.26.11",
+    "typedoc-plugin-extras": "^3.1.0",
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.5"
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false
+}
