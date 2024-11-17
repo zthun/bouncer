@@ -3,13 +3,13 @@ export default {
     {
       name: `database.local.zthunworks.com`,
       paths: {
-        "/": "helpful-mongo-admin:8081",
+        "/": "bouncer-mongo-admin:8081",
       },
     },
     {
       name: `email.local.zthunworks.com`,
       paths: {
-        "/": "helpful-email",
+        "/": "bouncer-email",
       },
     },
   ],
