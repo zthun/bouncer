@@ -1,0 +1,24 @@
+services:
+  bouncer-services-proxy:
+    image: node:lts
+    ports:
+      - 80:80
+      - 443:443
+      - 9230:9229
+    volumes:
+      - .:/usr/dev
+    working_dir: /usr/dev
+    command: npm --workspace @zthun/bouncer-proxy run debug
+    depends_on:
+      - bouncer-mongo-admin
+      - bouncer-email
+  bouncer-mongo:
+    image: mongo:5.0.5
+  bouncer-mongo-admin:
+    image: mongo-express:0.54.0
+    depends_on:
+      - bouncer-mongo
+    environment:
+      - ME_CONFIG_MONGODB_SERVER=bouncer-mongo
+  bouncer-email:
+    image: rnwood/smtp4dev:v3.1
