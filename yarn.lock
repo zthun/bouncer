@@ -2640,14 +2640,14 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@zthun/bouncer-web@workspace:packages/bouncer-web"
   dependencies:
-    "@zthun/bouncer": "npm:1.0.0"
+    "@zthun/bouncer": "npm:^1.1.0"
     typedoc: "npm:^0.26.11"
     typedoc-plugin-extras: "npm:^3.1.0"
     typescript: "npm:^5.6.3"
   languageName: unknown
   linkType: soft
 
-"@zthun/bouncer@npm:1.0.0, @zthun/bouncer@workspace:packages/bouncer":
+"@zthun/bouncer@npm:^1.1.0, @zthun/bouncer@workspace:packages/bouncer":
   version: 0.0.0-use.local
   resolution: "@zthun/bouncer@workspace:packages/bouncer"
   dependencies:
