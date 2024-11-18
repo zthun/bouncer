@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { IZProxyConfigTemplate, ZProxyConfigBuilder } from "./proxy-config.mjs";
+import { IZProxyConfigTemplate, ZBouncerConfigBuilder } from "./config.mjs";
 
 describe("ZProxyConfig", () => {
-  const createTestTarget = () => new ZProxyConfigBuilder();
+  const createTestTarget = () => new ZBouncerConfigBuilder();
 
   describe("Assign", () => {
     it("should assign domains without blowing away security", () => {

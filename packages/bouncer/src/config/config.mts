@@ -1,9 +1,9 @@
-export interface IZProxyDomain {
+export interface IZBouncerDomain {
   name: string;
   paths: Record<string, string>;
 }
 
-export interface IZProxySecurity {
+export interface IZBouncerSecurity {
   organization: string;
   country: string;
   state: string;
@@ -11,18 +11,18 @@ export interface IZProxySecurity {
   email: string;
 }
 
-export interface IZProxyConfigTemplate {
-  security?: Partial<IZProxySecurity>;
-  domains?: IZProxyDomain[];
+export interface IZBouncerConfigTemplate {
+  security?: Partial<IZBouncerSecurity>;
+  domains?: IZBouncerDomain[];
 }
 
-export interface IZProxyConfig {
-  security: IZProxySecurity;
-  domains: IZProxyDomain[];
+export interface IZBouncerConfig {
+  security: IZBouncerSecurity;
+  domains: IZBouncerDomain[];
 }
 
-export class ZProxyConfigBuilder {
-  private _config: IZProxyConfig;
+export class ZBouncerConfigBuilder {
+  private _config: IZBouncerConfig;
 
   public constructor() {
     this._config = {
@@ -37,7 +37,7 @@ export class ZProxyConfigBuilder {
     };
   }
 
-  public assign(config: IZProxyConfigTemplate) {
+  public assign(config: IZBouncerConfigTemplate) {
     this._config = structuredClone(this._config);
     this._config.domains =
       config.domains?.slice() ?? this._config.domains.slice();
