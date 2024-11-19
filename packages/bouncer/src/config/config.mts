@@ -1,20 +1,5 @@
-export interface IZBouncerDomain {
-  name: string;
-  paths: Record<string, string>;
-}
-
-export interface IZBouncerSecurity {
-  organization: string;
-  country: string;
-  state: string;
-  city: string;
-  email: string;
-}
-
-export interface IZBouncerConfigTemplate {
-  security?: Partial<IZBouncerSecurity>;
-  domains?: IZBouncerDomain[];
-}
+import { IZBouncerDomain } from "./domain.mjs";
+import { IZBouncerSecurity, ZBouncerSecurityBuilder } from "./security.mjs";
 
 export interface IZBouncerConfig {
   security: IZBouncerSecurity;
@@ -27,17 +12,11 @@ export class ZBouncerConfigBuilder {
   public constructor() {
     this._config = {
       domains: [],
-      security: {
-        organization: "Developer Proxy Org",
-        country: "United States",
-        state: "California",
-        city: "Irvine",
-        email: "admin@dev-proxy.org",
-      },
+      security: new ZBouncerSecurityBuilder().build(),
     };
   }
 
-  public assign(config: IZBouncerConfigTemplate) {
+  public assign(config: Partial<IZBouncerConfig>) {
     this._config = structuredClone(this._config);
     this._config.domains =
       config.domains?.slice() ?? this._config.domains.slice();

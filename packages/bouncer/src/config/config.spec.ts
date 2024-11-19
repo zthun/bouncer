@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { IZProxyConfigTemplate, ZBouncerConfigBuilder } from "./config.mjs";
+import { IZBouncerConfig, ZBouncerConfigBuilder } from "./config.mjs";
+import { ZBouncerDomainBuilder } from "./domain.mjs";
+import { ZBouncerSecurityBuilder } from "./security.mjs";
 
 describe("ZProxyConfig", () => {
   const createTestTarget = () => new ZBouncerConfigBuilder();
@@ -8,9 +10,12 @@ describe("ZProxyConfig", () => {
     it("should assign domains without blowing away security", () => {
       // Arrange.
       const domains = [
-        { name: "zthunworks.com", paths: { "/": "localhost:8081" } },
+        new ZBouncerDomainBuilder()
+          .host("zthunworks.com")
+          .path("/", "localhost:8081")
+          .build(),
       ];
-      const partial: IZProxyConfigTemplate = { domains };
+      const partial: Partial<IZBouncerConfig> = { domains };
       const expected = createTestTarget().build();
       expected.domains = partial.domains!;
       const target = createTestTarget();
@@ -26,8 +31,11 @@ describe("ZProxyConfig", () => {
       // Arrange.
       const organization = "Foobar";
       const email = "foo@bar.com";
-      const security = { organization, email };
-      const partial: IZProxyConfigTemplate = { security };
+      const security = new ZBouncerSecurityBuilder()
+        .organization(organization)
+        .email(email)
+        .build();
+      const partial: Partial<IZBouncerConfig> = { security };
       const expected = createTestTarget().build();
       expected.security.organization = organization;
       expected.security.email = email;
