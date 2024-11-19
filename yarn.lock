@@ -2651,7 +2651,13 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@zthun/bouncer@workspace:packages/bouncer"
   dependencies:
+    "@types/lodash-es": "npm:^4.17.12"
+    "@zthun/helpful-fn": "npm:^6.6.0"
+    "@zthun/lumberjacky-log": "npm:^2.2.1"
+    "@zthun/webigail-http": "npm:^3.0.0"
+    "@zthun/webigail-url": "npm:^3.0.0"
     cosmiconfig: "npm:^9.0.0"
+    lodash-es: "npm:^4.17.21"
     typedoc: "npm:^0.26.11"
     typedoc-plugin-extras: "npm:^3.1.0"
     typescript: "npm:^5.6.3"
@@ -2675,6 +2681,15 @@ __metadata:
     prettier: ^3.0.0
     typescript: ^5.0.0
   checksum: 10c0/a2e88cf45ecd64fee13f3314e2a69ead3bef24c8d854bf80fd1e0a7a9d5c2a9bf6bdbec4fe955459284e1958d77a1c4cf3c3ad6c230c271ba480cbed31999b50
+  languageName: node
+  linkType: hard
+
+"@zthun/helpful-fn@npm:^6.6.0":
+  version: 6.6.0
+  resolution: "@zthun/helpful-fn@npm:6.6.0"
+  dependencies:
+    uuid: "npm:^11.0.3"
+  checksum: 10c0/60491ed93150525e49c144cc6d4494fc0d02d0c347b93f702a6efe4859456fe98d497e210eebe7eed05d3577239a7e5a754b2cef570243d742bb7e135fda3d29
   languageName: node
   linkType: hard
 
@@ -2736,6 +2751,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@zthun/lumberjacky-log@npm:^2.2.1":
+  version: 2.2.1
+  resolution: "@zthun/lumberjacky-log@npm:2.2.1"
+  dependencies:
+    lodash-es: "npm:^4.17.21"
+  checksum: 10c0/5d07444dd58b71c8431dc21a8da4c910613a319a501b78112b725df3654b66ecb926333bd005ad4bd19498a82c4cc42a0bb500275e4f10332537bc8f62e56370
+  languageName: node
+  linkType: hard
+
 "@zthun/markdownlint-config@npm:^18.0.4":
   version: 18.0.4
   resolution: "@zthun/markdownlint-config@npm:18.0.4"
@@ -2789,6 +2813,26 @@ __metadata:
     postcss: ^8.0.0
     stylelint: ^16.0.0
   checksum: 10c0/12ab26c8e92003fd389a31d58e64b4824ac469884cda878a0b8c0b00a69c99742772c629a844cd665f4216560ec22662b1c973a1decce96794d52184a6aa931b
+  languageName: node
+  linkType: hard
+
+"@zthun/webigail-http@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "@zthun/webigail-http@npm:3.0.0"
+  dependencies:
+    cross-fetch: "npm:^4.0.0"
+    lodash-es: "npm:^4.17.21"
+  checksum: 10c0/bbee594905f89f0f1c5d02881b6a3e5eed066fa06966db12dc364b4fbe7e15397434dd56f6dfdd9e3ed8a96688bde7a4e6a5e15c2894d8be9357e792e832e508
+  languageName: node
+  linkType: hard
+
+"@zthun/webigail-url@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "@zthun/webigail-url@npm:3.0.0"
+  dependencies:
+    lodash-es: "npm:^4.17.21"
+    url-parse: "npm:^1.5.10"
+  checksum: 10c0/4e3f1134f95df9d6c7ca93755d3c7a590337ae59f174d94f5987ffed2e3287bf4eebc4ccdac8a87d5a6323b8f159e581b16812c380a5d06ecda9f00f129e5861
   languageName: node
   linkType: hard
 
@@ -3269,7 +3313,7 @@ __metadata:
     "@vitest/coverage-istanbul": "npm:^2.1.5"
     "@zthun/lint-janitor": "npm:^18.0.4"
     "@zthun/lint-janitor-config": "npm:^18.0.4"
-    husky: "npm:^9.1.6"
+    husky: "npm:^9.1.7"
     lerna: "npm:^8.1.9"
     rimraf: "npm:^6.0.1"
     typescript: "npm:^5.6.3"
@@ -3924,6 +3968,15 @@ __metadata:
     typescript:
       optional: true
   checksum: 10c0/1c1703be4f02a250b1d6ca3267e408ce16abfe8364193891afc94c2d5c060b69611fdc8d97af74b7e6d5d1aac0ab2fb94d6b079573146bc2d756c2484ce5f0ee
+  languageName: node
+  linkType: hard
+
+"cross-fetch@npm:^4.0.0":
+  version: 4.0.0
+  resolution: "cross-fetch@npm:4.0.0"
+  dependencies:
+    node-fetch: "npm:^2.6.12"
+  checksum: 10c0/386727dc4c6b044746086aced959ff21101abb85c43df5e1d151547ccb6f338f86dec3f28b9dbddfa8ff5b9ec8662ed2263ad4607a93b2dc354fb7fe3bbb898a
   languageName: node
   linkType: hard
 
@@ -5962,12 +6015,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"husky@npm:^9.1.6":
-  version: 9.1.6
-  resolution: "husky@npm:9.1.6"
+"husky@npm:^9.1.7":
+  version: 9.1.7
+  resolution: "husky@npm:9.1.7"
   bin:
     husky: bin.js
-  checksum: 10c0/705673db4a247c1febd9c5df5f6a3519106cf0335845027bb50a15fba9b1f542cb2610932ede96fd08008f6d9f49db0f15560509861808b0031cdc0e7c798bac
+  checksum: 10c0/35bb110a71086c48906aa7cd3ed4913fb913823715359d65e32e0b964cb1e255593b0ae8014a5005c66a68e6fa66c38dcfa8056dbbdfb8b0187c0ffe7ee3a58f
   languageName: node
   linkType: hard
 
@@ -7871,7 +7924,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"node-fetch@npm:^2.6.2, node-fetch@npm:^2.6.7":
+"node-fetch@npm:^2.6.12, node-fetch@npm:^2.6.2, node-fetch@npm:^2.6.7":
   version: 2.7.0
   resolution: "node-fetch@npm:2.7.0"
   dependencies:
@@ -8962,6 +9015,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"querystringify@npm:^2.1.1":
+  version: 2.2.0
+  resolution: "querystringify@npm:2.2.0"
+  checksum: 10c0/3258bc3dbdf322ff2663619afe5947c7926a6ef5fb78ad7d384602974c467fadfc8272af44f5eb8cddd0d011aae8fabf3a929a8eee4b86edcc0a21e6bd10f9aa
+  languageName: node
+  linkType: hard
+
 "queue-microtask@npm:^1.2.2":
   version: 1.2.3
   resolution: "queue-microtask@npm:1.2.3"
@@ -9164,6 +9224,13 @@ __metadata:
   version: 2.0.2
   resolution: "require-from-string@npm:2.0.2"
   checksum: 10c0/aaa267e0c5b022fc5fd4eef49d8285086b15f2a1c54b28240fdf03599cbd9c26049fee3eab894f2e1f6ca65e513b030a7c264201e3f005601e80c49fb2937ce2
+  languageName: node
+  linkType: hard
+
+"requires-port@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "requires-port@npm:1.0.0"
+  checksum: 10c0/b2bfdd09db16c082c4326e573a82c0771daaf7b53b9ce8ad60ea46aa6e30aaf475fe9b164800b89f93b748d2c234d8abff945d2551ba47bf5698e04cd7713267
   languageName: node
   linkType: hard
 
@@ -10726,6 +10793,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"url-parse@npm:^1.5.10":
+  version: 1.5.10
+  resolution: "url-parse@npm:1.5.10"
+  dependencies:
+    querystringify: "npm:^2.1.1"
+    requires-port: "npm:^1.0.0"
+  checksum: 10c0/bd5aa9389f896974beb851c112f63b466505a04b4807cea2e5a3b7092f6fbb75316f0491ea84e44f66fed55f1b440df5195d7e3a8203f64fcefa19d182f5be87
+  languageName: node
+  linkType: hard
+
 "util-deprecate@npm:^1.0.1, util-deprecate@npm:^1.0.2, util-deprecate@npm:~1.0.1":
   version: 1.0.2
   resolution: "util-deprecate@npm:1.0.2"
@@ -10739,6 +10816,15 @@ __metadata:
   bin:
     uuid: dist/bin/uuid
   checksum: 10c0/eab18c27fe4ab9fb9709a5d5f40119b45f2ec8314f8d4cf12ce27e4c6f4ffa4a6321dc7db6c515068fa373c075b49691ba969f0010bf37f44c37ca40cd6bf7fe
+  languageName: node
+  linkType: hard
+
+"uuid@npm:^11.0.3":
+  version: 11.0.3
+  resolution: "uuid@npm:11.0.3"
+  bin:
+    uuid: dist/esm/bin/uuid
+  checksum: 10c0/cee762fc76d949a2ff9205770334699e0043d52bb766472593a25f150077c9deed821230251ea3d6ab3943a5ea137d2826678797f1d5f6754c7ce5ce27e9f7a6
   languageName: node
   linkType: hard
 
