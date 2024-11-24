@@ -15,8 +15,7 @@ export class ZBouncerBindBuilder {
     return this;
   }
 
-  public allNetworks = this.host.bind(this, "0.0.0.0");
-  public localhost = this.host.bind(this, "127.0.0.1");
+  public all = this.host.bind(this, "0.0.0.0");
 
   public port(val: number) {
     this._bind.port = val;
