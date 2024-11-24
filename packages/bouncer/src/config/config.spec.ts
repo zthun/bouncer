@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
+import { ZBouncerDomainBuilder } from "./config-domain.mjs";
+import { ZBouncerSecurityBuilder } from "./config-security.mjs";
 import { IZBouncerConfig, ZBouncerConfigBuilder } from "./config.mjs";
-import { ZBouncerDomainBuilder } from "./domain.mjs";
-import { ZBouncerSecurityBuilder } from "./security.mjs";
 
 describe("ZProxyConfig", () => {
   const createTestTarget = () => new ZBouncerConfigBuilder();
