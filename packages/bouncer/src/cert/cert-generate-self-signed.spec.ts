@@ -8,10 +8,10 @@ import {
   IZBouncerSecurity,
   ZBouncerSecurityBuilder,
 } from "../config/config-security.mjs";
-import { ZCertGenerateSelfSigned } from "./cert-generate-self-signed";
+import { ZBouncerCertGenerateSelfSigned } from "./cert-generate-self-signed";
 
-describe("ZCertGenerateSelfSigned", () => {
-  const createTestTarget = () => new ZCertGenerateSelfSigned();
+describe("ZBouncerCertGenerateSelfSigned", () => {
+  const createTestTarget = () => new ZBouncerCertGenerateSelfSigned();
 
   describe("Subject", () => {
     const shouldSetSubjectValue = async (

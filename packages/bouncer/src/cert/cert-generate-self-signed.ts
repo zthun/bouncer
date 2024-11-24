@@ -2,9 +2,9 @@ import { generate } from "selfsigned";
 import { IZBouncerDomain } from "../config/config-domain.mjs";
 import { IZBouncerSecurity } from "../config/config-security.mjs";
 import { IZCert } from "./cert";
-import { IZCertGenerate } from "./cert-generate";
+import { IZBouncerCertGenerate } from "./cert-generate";
 
-export class ZCertGenerateSelfSigned implements IZCertGenerate {
+export class ZBouncerCertGenerateSelfSigned implements IZBouncerCertGenerate {
   create(domain: IZBouncerDomain, options: IZBouncerSecurity): Promise<IZCert> {
     const pem = generate(
       [
