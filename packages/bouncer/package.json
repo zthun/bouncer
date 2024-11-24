@@ -23,7 +23,8 @@
     "@zthun/webigail-http": "^3.0.0",
     "@zthun/webigail-url": "^3.0.0",
     "cosmiconfig": "^9.0.0",
-    "lodash-es": "^4.17.21"
+    "lodash-es": "^4.17.21",
+    "selfsigned": "^2.4.1"
   },
   "devDependencies": {
     "@types/lodash-es": "^4.17.12",
