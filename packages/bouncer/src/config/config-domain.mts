@@ -8,7 +8,7 @@ export class ZBouncerDomainBuilder {
 
   public constructor() {
     this._domain = {
-      host: "local",
+      host: "localhost",
       paths: {},
     };
   }
