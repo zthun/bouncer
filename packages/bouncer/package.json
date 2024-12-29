@@ -18,10 +18,10 @@
     "access": "public"
   },
   "dependencies": {
-    "@zthun/helpful-fn": "^6.6.0",
-    "@zthun/lumberjacky-log": "^2.2.1",
-    "@zthun/webigail-http": "^3.0.0",
-    "@zthun/webigail-url": "^3.0.0",
+    "@zthun/helpful-fn": "^6.7.0",
+    "@zthun/lumberjacky-log": "^2.2.2",
+    "@zthun/webigail-http": "^3.0.2",
+    "@zthun/webigail-url": "^3.0.2",
     "cosmiconfig": "^9.0.0",
     "lodash-es": "^4.17.21",
     "selfsigned": "^2.4.1"
@@ -30,8 +30,8 @@
     "@types/lodash-es": "^4.17.12",
     "typedoc": "^0.26.11",
     "typedoc-plugin-extras": "^3.1.0",
-    "typescript": "^5.6.3",
-    "vitest": "^2.1.5"
+    "typescript": "~5.6.3",
+    "vitest": "^2.1.8"
   },
   "files": [
     "dist"
