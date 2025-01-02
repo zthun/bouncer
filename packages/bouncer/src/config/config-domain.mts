@@ -20,7 +20,7 @@ export class ZBouncerDomainBuilder {
   }
 
   public path(path: string, redirect: string) {
-    this._domain[path] = redirect;
+    this._domain.paths[path] = redirect;
 
     return this;
   }
