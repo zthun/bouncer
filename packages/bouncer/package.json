@@ -20,7 +20,7 @@
   "dependencies": {
     "@zthun/helpful-fn": "^6.7.0",
     "@zthun/lumberjacky-log": "^2.2.2",
-    "@zthun/webigail-http": "^3.0.2",
+    "@zthun/webigail-http": "^3.1.0",
     "@zthun/webigail-url": "^3.0.2",
     "cosmiconfig": "^9.0.0",
     "lodash-es": "^4.17.21",
