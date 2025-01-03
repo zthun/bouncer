@@ -4,7 +4,7 @@ services:
     ports:
       - 80:80
       - 443:443
-      - 9230:9229
+      - 9229:9229
     volumes:
       - .:/usr/dev
     working_dir: /usr/dev
@@ -21,4 +21,4 @@ services:
     environment:
       - ME_CONFIG_MONGODB_SERVER=bouncer-mongo
   bouncer-email:
-    image: rnwood/smtp4dev:v3.1
+    image: rnwood/smtp4dev:latest
