@@ -8,6 +8,5 @@
   "exclude": ["./"],
   "excludeNotDocumented": true,
   "name": "Bouncer",
-  "plugin": ["typedoc-plugin-extras"],
   "favicon": "public/images/svg/bouncer.svg"
 }
