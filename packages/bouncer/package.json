@@ -13,7 +13,8 @@
   "main": "./dist/main.mjs",
   "bin": "./bin/main.mjs",
   "scripts": {
-    "build": "tsc -p tsconfig.prod.json"
+    "build": "tsc -p tsconfig.prod.json",
+    "debug": "tsx --inspect=0.0.0.0:9229 ./src/main.mts"
   },
   "publishConfig": {
     "access": "public"
@@ -21,7 +22,7 @@
   "dependencies": {
     "@zthun/helpful-fn": "^6.7.0",
     "@zthun/lumberjacky-log": "^2.2.2",
-    "@zthun/webigail-http": "^3.1.1",
+    "@zthun/webigail-http": "^3.1.2",
     "@zthun/webigail-url": "^3.0.2",
     "cosmiconfig": "^9.0.0",
     "http-reverse-proxy-ts": "^1.0.1",
@@ -29,6 +30,7 @@
   },
   "devDependencies": {
     "@types/lodash-es": "^4.17.12",
+    "tsx": "^4.19.2",
     "typedoc": "^0.26.11",
     "typedoc-plugin-extras": "^3.1.0",
     "typescript": "~5.6.3",
