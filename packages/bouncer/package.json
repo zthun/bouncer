@@ -1,7 +1,7 @@
 {
   "name": "@zthun/bouncer",
   "version": "1.1.0",
-  "description": "A reverse proxy written in node-js.",
+  "description": "A declarative reverse proxy server in nodejs.",
   "author": "Anthony Bonta",
   "license": "MIT",
   "type": "module",
@@ -10,7 +10,8 @@
     "url": "https://github.com/zthun/bouncer",
     "directory": "packages/bouncer"
   },
-  "main": "./dist/main.js",
+  "main": "./dist/main.mjs",
+  "bin": "./bin/main.mjs",
   "scripts": {
     "build": "tsc -p tsconfig.prod.json"
   },
@@ -23,9 +24,8 @@
     "@zthun/webigail-http": "^3.1.1",
     "@zthun/webigail-url": "^3.0.2",
     "cosmiconfig": "^9.0.0",
-    "lodash-es": "^4.17.21",
-    "redbird": "^1.0.2",
-    "selfsigned": "^2.4.1"
+    "http-reverse-proxy-ts": "^1.0.1",
+    "lodash-es": "^4.17.21"
   },
   "devDependencies": {
     "@types/lodash-es": "^4.17.12",
