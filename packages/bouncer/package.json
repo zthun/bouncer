@@ -14,7 +14,8 @@
   "bin": "./bin/main.mjs",
   "scripts": {
     "build": "tsc -p tsconfig.prod.json",
-    "debug": "tsx --inspect=0.0.0.0:9229 ./src/main.mts"
+    "debug": "tsx --inspect=0.0.0.0:9229 ./src/main.mts",
+    "start": "node ./bin/main.mjs"
   },
   "publishConfig": {
     "access": "public"
