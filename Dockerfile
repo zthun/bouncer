@@ -31,11 +31,11 @@ RUN --mount=type=secret,id=GIT_CREDENTIALS,dst=/root/.git-credentials npx lerna 
     git push --tags
 RUN --mount=type=secret,id=NPM_CREDENTIALS,dst=/root/.npmrc npx lerna publish from-package --yes
 
-FROM node:lts as bouncer-proxy
-RUN npm install -g @zthun/bouncer-proxy
+FROM node:lts as bouncer
+RUN npm install -g @zthun/bouncer
 EXPOSE 80
 EXPOSE 443
-CMD ["bouncer-proxy"]
+CMD ["bouncer"]
 
 FROM node:lts-alpine as bouncer-web-install
 RUN npm install -g @zthun/bouncer-web
