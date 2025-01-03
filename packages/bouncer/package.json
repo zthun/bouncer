@@ -1,6 +1,6 @@
 {
   "name": "@zthun/bouncer",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "A declarative reverse proxy server in nodejs.",
   "author": "Anthony Bonta",
   "license": "MIT",
