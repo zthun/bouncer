@@ -8,7 +8,7 @@
       "name": "Launch Proxy",
       "type": "node",
       "request": "launch",
-      "program": "${workspaceFolder}/packages/bouncer/src/main.ts",
+      "program": "${workspaceFolder}/packages/bouncer/src/main.mts",
       "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/tsx",
       "internalConsoleOptions": "openOnSessionStart"
     }
