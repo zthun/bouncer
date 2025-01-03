@@ -1,5 +1,4 @@
 import { merge } from "lodash-es";
-import { IZBouncerBind, ZBouncerBindBuilder } from "./config-bind.mjs";
 import { IZBouncerDomain } from "./config-domain.mjs";
 import {
   IZBouncerSecurity,
@@ -7,8 +6,6 @@ import {
 } from "./config-security.mjs";
 
 export interface IZBouncerConfig {
-  http: IZBouncerBind;
-  https: IZBouncerBind;
   security: IZBouncerSecurity;
   domains: IZBouncerDomain[];
 }
@@ -18,8 +15,6 @@ export class ZBouncerConfigBuilder {
 
   public constructor() {
     this._config = {
-      http: new ZBouncerBindBuilder().build(),
-      https: new ZBouncerBindBuilder().build(),
       domains: [],
       security: new ZBouncerSecurityBuilder().build(),
     };
@@ -33,16 +28,6 @@ export class ZBouncerConfigBuilder {
 
   public domain(domain: IZBouncerDomain) {
     return this.domains(this._config.domains.concat(domain));
-  }
-
-  public http(bind: IZBouncerBind) {
-    this._config.http = bind;
-    return this;
-  }
-
-  public https(bind: IZBouncerBind) {
-    this._config.https = bind;
-    return this;
   }
 
   public assign(config: Partial<IZBouncerConfig>) {
