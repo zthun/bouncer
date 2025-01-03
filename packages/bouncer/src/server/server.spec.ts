@@ -19,7 +19,7 @@ import { Agent, request, RequestOptions } from "node:https";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { ZBouncerDomainBuilder } from "../config/config-domain.mjs";
 import { ZBouncerConfigBuilder } from "../config/config.mjs";
-import { IZBouncerServer, ZBouncerServer } from "./server";
+import { IZBouncerServer, ZBouncerServer } from "./server.mjs";
 
 describe("Server", () => {
   let _server8080: Server;
