@@ -21,10 +21,10 @@
     "access": "public"
   },
   "dependencies": {
-    "@zthun/helpful-fn": "^6.7.0",
-    "@zthun/lumberjacky-log": "^2.2.2",
-    "@zthun/webigail-http": "^3.1.2",
-    "@zthun/webigail-url": "^3.0.2",
+    "@zthun/helpful-fn": "^7.0.5",
+    "@zthun/lumberjacky-log": "^2.2.3",
+    "@zthun/webigail-http": "^3.1.3",
+    "@zthun/webigail-url": "^3.1.3",
     "cosmiconfig": "^9.0.0",
     "http-reverse-proxy-ts": "^1.0.1",
     "lodash-es": "^4.17.21"
