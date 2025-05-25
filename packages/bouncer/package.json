@@ -21,20 +21,20 @@
     "access": "public"
   },
   "dependencies": {
-    "@zthun/helpful-fn": "^7.0.5",
-    "@zthun/lumberjacky-log": "^2.2.3",
-    "@zthun/webigail-http": "^3.1.3",
-    "@zthun/webigail-url": "^3.1.3",
+    "@zthun/helpful-fn": "^7.2.1",
+    "@zthun/lumberjacky-log": "^2.3.0",
+    "@zthun/webigail-http": "^3.3.0",
+    "@zthun/webigail-url": "^3.3.0",
     "cosmiconfig": "^9.0.0",
     "http-reverse-proxy-ts": "^1.0.1",
     "lodash-es": "^4.17.21"
   },
   "devDependencies": {
     "@types/lodash-es": "^4.17.12",
-    "tsx": "^4.19.2",
-    "typedoc": "^0.27.6",
-    "typescript": "~5.7.2",
-    "vitest": "^2.1.8"
+    "tsx": "^4.19.4",
+    "typedoc": "^0.28.4",
+    "typescript": "~5.8.3",
+    "vitest": "^3.1.4"
   },
   "files": [
     "dist"
