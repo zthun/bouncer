@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.0.0](https://github.com/zthun/bouncer/compare/v1.2.2...v2.0.0) (2025-06-10)
+
+
+### ⚠ BREAKING CHANGES
+
+* update module resolution to node next
+
+### Build System
+
+* update module resolution to node next ([7f3b18b](https://github.com/zthun/bouncer/commit/7f3b18b02927203d66e5b305adec573647472994))
+
+
+
 ## [1.2.2](https://github.com/zthun/bouncer/compare/v1.2.1...v1.2.2) (2025-05-25)
 
 **Note:** Version bump only for package @zthun/bouncer
