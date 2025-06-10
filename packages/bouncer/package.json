@@ -10,10 +10,17 @@
     "url": "https://github.com/zthun/bouncer",
     "directory": "packages/bouncer"
   },
-  "main": "./dist/main.mjs",
-  "bin": "./bin/main.mjs",
+  "types": "./dist/index.d.mts",
+  "module": "./dist/index.js",
+  "main": "./dist/index.cjs",
+  "exports": {
+    "types": "./dist/index.d.mts",
+    "import": "./dist/index.js",
+    "require": "./dist/index.cjs"
+  },
+  "bin": "./bin/cli.mjs",
   "scripts": {
-    "build": "tsc -p tsconfig.prod.json",
+    "build": "vite build",
     "debug": "tsx --inspect=0.0.0.0:9229 ./src/main.mts",
     "start": "node ./bin/main.mjs"
   },
@@ -31,9 +38,11 @@
   },
   "devDependencies": {
     "@types/lodash-es": "^4.17.12",
+    "@zthun/janitor-build-config": "^19.1.5",
     "tsx": "^4.19.4",
     "typedoc": "^0.28.5",
     "typescript": "~5.8.3",
+    "vite": "^6.3.5",
     "vitest": "^3.2.3"
   },
   "files": [

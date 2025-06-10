@@ -3196,6 +3196,7 @@ __metadata:
   dependencies:
     "@types/lodash-es": "npm:^4.17.12"
     "@zthun/helpful-fn": "npm:^7.2.1"
+    "@zthun/janitor-build-config": "npm:^19.1.5"
     "@zthun/lumberjacky-log": "npm:^2.3.0"
     "@zthun/webigail-http": "npm:^3.3.0"
     "@zthun/webigail-url": "npm:^3.3.0"
@@ -3205,9 +3206,10 @@ __metadata:
     tsx: "npm:^4.19.4"
     typedoc: "npm:^0.28.5"
     typescript: "npm:~5.8.3"
+    vite: "npm:^6.3.5"
     vitest: "npm:^3.2.3"
   bin:
-    bouncer: ./bin/main.mjs
+    bouncer: ./bin/cli.mjs
   languageName: unknown
   linkType: soft
 
