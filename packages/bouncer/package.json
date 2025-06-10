@@ -22,7 +22,7 @@
   "scripts": {
     "build": "vite build",
     "debug": "tsx --inspect=0.0.0.0:9229 ./src/main.mts",
-    "start": "node ./bin/main.mjs"
+    "start": "node ./bin/cli.mjs"
   },
   "publishConfig": {
     "access": "public"
