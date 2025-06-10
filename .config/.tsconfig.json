@@ -7,11 +7,12 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "resolveJsonModule": true,
+    "isolatedModules": true,
     "declaration": true,
     "strictNullChecks": true,
     "strictBindCallApply": true,
     "skipLibCheck": true,
-    "jsx": "react",
+    "jsx": "react-jsx",
     "target": "es5",
     "module": "es2015"
   }

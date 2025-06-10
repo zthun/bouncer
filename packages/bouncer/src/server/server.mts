@@ -1,19 +1,18 @@
-import {
-  IZLogger,
-  ZLogEntryBuilder,
-  ZLoggerContext,
-} from "@zthun/lumberjacky-log";
-import {
-  HttpReverseProxy,
+import type { IZLogger } from "@zthun/lumberjacky-log";
+import { ZLogEntryBuilder, ZLoggerContext } from "@zthun/lumberjacky-log";
+import type {
   HttpReverseProxyOptions,
   HttpsServerOptions,
   LetsEncryptSelfSignedOptions,
-  LetsEncryptUsingSelfSigned,
   RouteRegistrationOptions,
+} from "http-reverse-proxy-ts";
+import {
+  HttpReverseProxy,
+  LetsEncryptUsingSelfSigned,
 } from "http-reverse-proxy-ts";
 import { join } from "node:path";
 import { cwd } from "node:process";
-import { IZBouncerConfig } from "../config/config.mjs";
+import type { IZBouncerConfig } from "../config/config.mjs";
 
 export interface IZBouncerServer {
   running(): Promise<boolean>;

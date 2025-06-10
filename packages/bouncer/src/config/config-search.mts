@@ -1,5 +1,6 @@
 import { cosmiconfig } from "cosmiconfig";
-import { IZBouncerConfig, ZBouncerConfigBuilder } from "./config.mjs";
+import type { IZBouncerConfig } from "./config.mjs";
+import { ZBouncerConfigBuilder } from "./config.mjs";
 
 export interface IZBouncerConfigSearch {
   search(name?: string): Promise<IZBouncerConfig>;

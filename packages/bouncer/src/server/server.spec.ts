@@ -1,7 +1,7 @@
 import { firstDefined } from "@zthun/helpful-fn";
 import { ZLoggerSilent } from "@zthun/lumberjacky-log";
+import type { IZHttpResult } from "@zthun/webigail-http";
 import {
-  IZHttpResult,
   ZHttpCodeServer,
   ZHttpCodeSuccess,
   ZHttpRequestBuilder,
@@ -9,17 +9,15 @@ import {
   ZHttpService,
 } from "@zthun/webigail-http";
 import { ZMimeTypeText, ZUrlBuilder } from "@zthun/webigail-url";
-import {
-  createServer,
-  IncomingMessage,
-  Server,
-  ServerResponse,
-} from "node:http";
-import { Agent, request, RequestOptions } from "node:https";
+import type { IncomingMessage, Server, ServerResponse } from "node:http";
+import { createServer } from "node:http";
+import type { RequestOptions } from "node:https";
+import { Agent, request } from "node:https";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { ZBouncerDomainBuilder } from "../config/config-domain.mjs";
 import { ZBouncerConfigBuilder } from "../config/config.mjs";
-import { IZBouncerServer, ZBouncerServer } from "./server.mjs";
+import type { IZBouncerServer } from "./server.mjs";
+import { ZBouncerServer } from "./server.mjs";
 
 describe("Server", () => {
   let _server8080: Server;

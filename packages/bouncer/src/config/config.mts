@@ -1,9 +1,7 @@
 import { merge } from "lodash-es";
-import { IZBouncerDomain } from "./config-domain.mjs";
-import {
-  IZBouncerSecurity,
-  ZBouncerSecurityBuilder,
-} from "./config-security.mjs";
+import type { IZBouncerDomain } from "./config-domain.mjs";
+import type { IZBouncerSecurity } from "./config-security.mjs";
+import { ZBouncerSecurityBuilder } from "./config-security.mjs";
 
 export interface IZBouncerConfig {
   security: IZBouncerSecurity;
