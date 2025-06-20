@@ -59,6 +59,7 @@ describe("Server", () => {
     _server8081.close();
 
     await _proxy.stop();
+    await _proxy.stop();
   });
 
   function invokeEndpoint(which: "eighty-eighty" | "eighty-eighty-one") {

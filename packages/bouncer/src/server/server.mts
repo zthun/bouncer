@@ -36,12 +36,8 @@ export class ZBouncerServer implements IZBouncerServer {
   }
 
   public async start(): Promise<void> {
-    this._log.log(
-      new ZLogEntryBuilder()
-        .info()
-        .message(`Current working directory: ${cwd()}`)
-        .build(),
-    );
+    let msg = `Current working directory: ${cwd()}`;
+    this._log.log(new ZLogEntryBuilder().info().message(msg).build());
 
     const letsEncryptOptions: LetsEncryptSelfSignedOptions = {
       country: this.config.security.country,
@@ -77,19 +73,14 @@ export class ZBouncerServer implements IZBouncerServer {
       Object.keys(d.paths).forEach((p) => {
         const endpoint = join(d.host, p);
         const forward = d.paths[p];
-        this._log.log(
-          new ZLogEntryBuilder()
-            .info()
-            .message(`Adding route, ${endpoint}, to ${forward}`)
-            .build(),
-        );
-        this._proxy?.addRoute(endpoint, forward, registrationOptions);
+        msg = `Adding route, ${endpoint}, to ${forward}`;
+        this._log.log(new ZLogEntryBuilder().info().message(msg).build());
+        this._proxy!.addRoute(endpoint, forward, registrationOptions);
       });
     });
 
-    this._log.log(
-      new ZLogEntryBuilder().info().message("Proxy server started").build(),
-    );
+    msg = "Proxy server started";
+    this._log.log(new ZLogEntryBuilder().info().message(msg).build());
   }
 
   stop(): Promise<void> {
