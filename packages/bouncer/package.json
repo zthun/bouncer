@@ -28,22 +28,22 @@
     "access": "public"
   },
   "dependencies": {
-    "@zthun/helpful-fn": "^7.2.1",
-    "@zthun/lumberjacky-log": "^2.3.0",
-    "@zthun/webigail-http": "^3.3.0",
-    "@zthun/webigail-url": "^3.3.0",
+    "@zthun/helpful-fn": "^9.3.0",
+    "@zthun/lumberjacky-log": "^3.0.1",
+    "@zthun/webigail-http": "^4.0.3",
+    "@zthun/webigail-url": "^4.0.3",
     "cosmiconfig": "^9.0.0",
     "http-reverse-proxy-ts": "^1.0.1",
     "lodash-es": "^4.17.21"
   },
   "devDependencies": {
     "@types/lodash-es": "^4.17.12",
-    "@zthun/janitor-build-config": "^19.1.5",
-    "tsx": "^4.19.4",
+    "@zthun/janitor-build-config": "^19.2.2",
+    "tsx": "^4.20.3",
     "typedoc": "^0.28.5",
     "typescript": "~5.8.3",
     "vite": "^6.3.5",
-    "vitest": "^3.2.3"
+    "vitest": "^3.2.4"
   },
   "files": [
     "dist"
