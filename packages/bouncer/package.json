@@ -21,24 +21,24 @@
   "bin": "./bin/cli.mjs",
   "scripts": {
     "build": "vite build",
-    "debug": "tsx --inspect=0.0.0.0:9229 ./src/main.mts",
+    "debug": "tsx --inspect=0.0.0.0:9229 ./src/cli.mts",
     "start": "node ./bin/cli.mjs"
   },
   "publishConfig": {
     "access": "public"
   },
   "dependencies": {
-    "@zthun/helpful-fn": "^9.3.0",
-    "@zthun/lumberjacky-log": "^3.0.1",
-    "@zthun/webigail-http": "^4.0.3",
-    "@zthun/webigail-url": "^4.0.3",
+    "@zthun/helpful-fn": "^9.4.0",
+    "@zthun/lumberjacky-log": "^3.0.2",
+    "@zthun/webigail-http": "^4.0.4",
+    "@zthun/webigail-url": "^4.0.4",
     "cosmiconfig": "^9.0.0",
     "http-reverse-proxy-ts": "^1.0.1",
     "lodash-es": "^4.17.21"
   },
   "devDependencies": {
     "@types/lodash-es": "^4.17.12",
-    "@zthun/janitor-build-config": "^19.2.2",
+    "@zthun/janitor-build-config": "^19.2.4",
     "tsx": "^4.20.3",
     "typedoc": "^0.28.5",
     "typescript": "~5.8.3",
