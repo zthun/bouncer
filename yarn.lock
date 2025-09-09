@@ -3193,13 +3193,13 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@zthun/bouncer-web@workspace:packages/bouncer-web"
   dependencies:
-    "@zthun/bouncer": "npm:^2.0.4"
+    "@zthun/bouncer": "npm:^2.0.5"
     typedoc: "npm:^0.28.12"
     typescript: "npm:~5.9.2"
   languageName: unknown
   linkType: soft
 
-"@zthun/bouncer@npm:^2.0.4, @zthun/bouncer@workspace:packages/bouncer":
+"@zthun/bouncer@npm:^2.0.5, @zthun/bouncer@workspace:packages/bouncer":
   version: 0.0.0-use.local
   resolution: "@zthun/bouncer@workspace:packages/bouncer"
   dependencies:
