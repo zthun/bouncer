@@ -1,6 +1,6 @@
 {
   "name": "@zthun/bouncer-web",
-  "version": "2.0.5",
+  "version": "2.0.6",
   "description": "A documentation website for showing bouncer.",
   "author": "Anthony Bonta",
   "license": "MIT",
@@ -18,7 +18,7 @@
     "access": "public"
   },
   "devDependencies": {
-    "@zthun/bouncer": "^2.0.5",
+    "@zthun/bouncer": "^2.0.6",
     "typedoc": "^0.28.13",
     "typescript": "~5.9.3"
   },
