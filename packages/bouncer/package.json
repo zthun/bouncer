@@ -28,10 +28,10 @@
     "access": "public"
   },
   "dependencies": {
-    "@zthun/helpful-fn": "^9.4.5",
-    "@zthun/lumberjacky-log": "^3.0.6",
-    "@zthun/webigail-http": "^4.0.8",
-    "@zthun/webigail-url": "^4.0.8",
+    "@zthun/helpful-fn": "^9.6.0",
+    "@zthun/lumberjacky-log": "^3.0.7",
+    "@zthun/webigail-http": "^4.0.9",
+    "@zthun/webigail-url": "^4.0.9",
     "cosmiconfig": "^9.0.0",
     "http-reverse-proxy-ts": "^1.0.1",
     "lodash-es": "^4.17.21"
@@ -40,9 +40,9 @@
     "@types/lodash-es": "^4.17.12",
     "@zthun/janitor-build-config": "^19.3.6",
     "tsx": "^4.20.6",
-    "typedoc": "^0.28.13",
+    "typedoc": "^0.28.14",
     "typescript": "~5.9.3",
-    "vite": "^7.1.9",
+    "vite": "^7.1.10",
     "vitest": "^3.2.4"
   },
   "files": [
