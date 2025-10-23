@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.0.0](https://github.com/zthun/bouncer/compare/v2.0.7...v3.0.0) (2025-10-23)
+
+
+### ⚠ BREAKING CHANGES
+
+* target is now es2020
+
+### Build System
+
+* target is now es2020 ([c86ad22](https://github.com/zthun/bouncer/commit/c86ad220a516eb01676c99a0c976da520ea7d857))
+
+
+
 ## [2.0.7](https://github.com/zthun/bouncer/compare/v2.0.6...v2.0.7) (2025-10-19)
 
 **Note:** Version bump only for package bouncer
