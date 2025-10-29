@@ -108,7 +108,7 @@ describe("Server", () => {
     expect(await _proxy.running()).toBeTruthy();
   });
 
-  describe.sequential("Missing config entry", () => {
+  describe("Missing config entry", () => {
     it("should return a 404 error if no such mapping can be found", async () => {
       // Arrange.
 
@@ -138,7 +138,7 @@ describe("Server", () => {
     });
   });
 
-  describe.sequential("Found config entry", () => {
+  describe("Found config entry", () => {
     it("should forward the request", async () => {
       // Arrange.
       const expected = "8080";
