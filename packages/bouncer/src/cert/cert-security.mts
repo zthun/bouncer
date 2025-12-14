@@ -27,6 +27,12 @@ export class ZBouncerCertSecurityBuilder {
     return this;
   }
 
+  public country(val: string) {
+    this._security.country = val;
+
+    return this;
+  }
+
   public email(val: string) {
     this._security.email = val;
 
