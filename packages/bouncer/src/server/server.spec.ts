@@ -14,6 +14,7 @@ import { createServer } from "node:http";
 import type { RequestOptions } from "node:https";
 import { Agent, request } from "node:https";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { ZBouncerCertGeneratorSelfSigned } from "../cert/cert-generator-self-signed.mjs";
 import { ZBouncerDomainBuilder } from "../config/config-domain.mjs";
 import { ZBouncerConfigBuilder } from "../config/config.mjs";
 import type { IZBouncerServer } from "./server.mjs";
@@ -30,8 +31,14 @@ describe("Server", () => {
       .path("/eighty-eighty", "http://localhost:8080")
       .path("/eighty-eighty-one", "http://localhost:8081")
       .build();
+    const logger = new ZLoggerSilent();
+
     const config = new ZBouncerConfigBuilder().domain(localhost).build();
-    _proxy = new ZBouncerServer(config, new ZLoggerSilent());
+    _proxy = new ZBouncerServer(
+      config,
+      new ZBouncerCertGeneratorSelfSigned(logger),
+      logger,
+    );
 
     await _proxy.start();
 

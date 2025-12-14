@@ -34,7 +34,6 @@
     "@zthun/webigail-http": "^5.0.2",
     "@zthun/webigail-url": "^5.0.2",
     "cosmiconfig": "^9.0.0",
-    "http-reverse-proxy-ts": "^1.0.1",
     "lodash-es": "^4.17.21"
   },
   "devDependencies": {
