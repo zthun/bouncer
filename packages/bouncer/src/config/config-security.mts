@@ -12,7 +12,7 @@ export class ZBouncerSecurityBuilder {
   public constructor() {
     this._security = {
       organization: "Developer Proxy Org",
-      country: "United States",
+      country: "US",
       state: "California",
       city: "Irvine",
       email: "admin@dev-proxy.org",
