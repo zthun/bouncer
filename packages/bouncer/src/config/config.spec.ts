@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
+import { ZBouncerCertSecurityBuilder } from "../cert/cert-security.mjs";
 import { ZBouncerDomainBuilder } from "./config-domain.mjs";
-import { ZBouncerSecurityBuilder } from "./config-security.mjs";
 import type { IZBouncerConfig } from "./config.mjs";
 import { ZBouncerConfigBuilder } from "./config.mjs";
 
@@ -32,7 +32,7 @@ describe("ZProxyConfig", () => {
       // Arrange.
       const organization = "Foobar";
       const email = "foo@bar.com";
-      const security = new ZBouncerSecurityBuilder()
+      const security = new ZBouncerCertSecurityBuilder()
         .organization(organization)
         .email(email)
         .build();
