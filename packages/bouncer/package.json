@@ -28,6 +28,7 @@
     "access": "public"
   },
   "dependencies": {
+    "@zthun/crumbtrail-fs": "^2.4.2",
     "@zthun/helpful-fn": "^9.11.1",
     "@zthun/lumberjacky-log": "^4.0.2",
     "@zthun/webigail-http": "^5.0.2",
