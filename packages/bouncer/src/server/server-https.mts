@@ -1,9 +1,10 @@
 import type { IZLogger } from "@zthun/lumberjacky-log";
 import { ZLogEntryBuilder, ZLoggerContext } from "@zthun/lumberjacky-log";
 import type { IncomingMessage, ServerResponse } from "node:http";
+import { request as httpRequest } from "node:http";
 import {
   createServer,
-  request,
+  request as httpsRequest,
   type RequestOptions,
   type Server,
 } from "node:https";
@@ -152,7 +153,10 @@ export class ZBouncerServerHttps implements IZBouncerServer {
       },
     };
 
-    const proxy = request(options, (forwarded) => {
+    const forwardRequest =
+      targetUrl.protocol === "https:" ? httpsRequest : httpRequest;
+
+    const proxy = forwardRequest(options, (forwarded) => {
       res.writeHead(
         forwarded.statusCode ?? 502,
         forwarded.statusMessage,
