@@ -8,7 +8,6 @@ import {
   type Server,
 } from "node:https";
 import { join } from "node:path";
-import { env } from "process";
 import type { IZBouncerCertGenerator, IZBouncerConfig } from "../index.mjs";
 import type { IZBouncerServer } from "./server.mjs";
 
@@ -59,7 +58,7 @@ export class ZBouncerServerHttps implements IZBouncerServer {
 
     this._https = createServer({ key, cert }, requestHandler);
 
-    await this._listen(this._https, +(env.HTTPS_PORT || 443));
+    await this._listen(this._https);
 
     msg = "Proxy server started";
     this._log.log(new ZLogEntryBuilder().info().message(msg).build());
@@ -71,15 +70,10 @@ export class ZBouncerServerHttps implements IZBouncerServer {
     this._routes = [];
   }
 
-  private _listen(server: Server | null, port: number) {
+  private _listen(server: Server) {
     return new Promise<void>((resolve, reject) => {
-      if (!server) {
-        resolve();
-        return;
-      }
-
       server.once("error", reject);
-      server.listen(port, () => {
+      server.listen(443, () => {
         server.removeListener("error", reject);
         resolve();
       });
