@@ -4,9 +4,7 @@ import type { IZHttpResult } from "@zthun/webigail-http";
 import {
   ZHttpCodeServer,
   ZHttpCodeSuccess,
-  ZHttpRequestBuilder,
   ZHttpResultBuilder,
-  ZHttpService,
 } from "@zthun/webigail-http";
 import { ZMimeTypeText, ZUrlBuilder } from "@zthun/webigail-url";
 import type { IncomingMessage, Server, ServerResponse } from "node:http";
@@ -56,14 +54,8 @@ describe("Server", () => {
     _server8081.close();
   });
 
-  function invokeEndpoint(which: "eighty-eighty" | "eighty-eighty-one") {
+  function invokeUrl(url: string) {
     return new Promise<IZHttpResult>((res, rej) => {
-      const url = new ZUrlBuilder()
-        .protocol("https")
-        .hostname("localhost")
-        .path(which)
-        .build();
-
       const options: RequestOptions = {
         agent: new Agent({
           rejectUnauthorized: false,
@@ -98,6 +90,16 @@ describe("Server", () => {
     });
   }
 
+  function invokeEndpoint(which: "eighty-eighty" | "eighty-eighty-one") {
+    return invokeUrl(
+      new ZUrlBuilder()
+        .protocol("https")
+        .hostname("localhost")
+        .path(which)
+        .build(),
+    );
+  }
+
   describe("Https", () => {
     const cert = new ZBouncerCertGeneratorSelfSigned(logger);
     let _proxy: ZBouncerServerHttps;
@@ -121,35 +123,29 @@ describe("Server", () => {
     describe("Missing config entry", () => {
       it("should return a 404 error if no such mapping can be found", async () => {
         // Arrange.
-
-        // Act.
         const url = new ZUrlBuilder()
           .protocol("https")
           .hostname("local.zthunworks.com")
           .build();
-        const request = new ZHttpRequestBuilder().get().url(url).build();
-        const actual = new ZHttpService().request(request);
+
+        // Act.
+        const actual = invokeUrl(url);
 
         // Assert.
-        await expect(actual).rejects.toEqual(
+        await expect(actual).resolves.toEqual(
           expect.objectContaining({ status: 404 }),
         );
       });
 
       it("should return a 404 error if the host is discovered but the path cannot be found", async () => {
         // Arrange.
-        const url = new ZUrlBuilder()
-          .protocol("https")
-          .hostname("localhost")
-          .append("api")
-          .build();
+        const url = "https://localhost/api";
 
         // Act.
-        const request = new ZHttpRequestBuilder().url(url).get().build();
-        const actual = new ZHttpService().request(request);
+        const actual = invokeUrl(url);
 
         // Assert.
-        await expect(actual).rejects.toEqual(
+        await expect(actual).resolves.toEqual(
           expect.objectContaining({ status: 404 }),
         );
       });
