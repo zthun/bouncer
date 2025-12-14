@@ -1,13 +1,14 @@
-export interface IZBouncerSecurity {
+export interface IZBouncerCertSecurity {
   organization: string;
   country: string;
   state: string;
   city: string;
   email: string;
+  domain: string;
 }
 
-export class ZBouncerSecurityBuilder {
-  private _security: IZBouncerSecurity;
+export class ZBouncerCertSecurityBuilder {
+  private _security: IZBouncerCertSecurity;
 
   public constructor() {
     this._security = {
@@ -16,6 +17,7 @@ export class ZBouncerSecurityBuilder {
       state: "California",
       city: "Irvine",
       email: "admin@dev-proxy.org",
+      domain: "localhost",
     };
   }
 
