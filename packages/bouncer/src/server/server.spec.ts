@@ -17,31 +17,21 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { ZBouncerCertGeneratorSelfSigned } from "../cert/cert-generator-self-signed.mjs";
 import { ZBouncerDomainBuilder } from "../config/config-domain.mjs";
 import { ZBouncerConfigBuilder } from "../config/config.mjs";
-import type { IZBouncerServer } from "./server.mjs";
-import { ZBouncerServer } from "./server.mjs";
+import { ZBouncerServerHttps } from "./server-https.mjs";
 
 describe("Server", () => {
+  const logger = new ZLoggerSilent();
+  const localhost = new ZBouncerDomainBuilder()
+    .host("localhost")
+    .path("/eighty-eighty", "http://localhost:8080")
+    .path("/eighty-eighty-one", "http://localhost:8081")
+    .build();
+  const config = new ZBouncerConfigBuilder().domain(localhost).build();
+
   let _server8080: Server;
   let _server8081: Server;
-  let _proxy: IZBouncerServer;
 
   beforeAll(async () => {
-    const localhost = new ZBouncerDomainBuilder()
-      .host("localhost")
-      .path("/eighty-eighty", "http://localhost:8080")
-      .path("/eighty-eighty-one", "http://localhost:8081")
-      .build();
-    const logger = new ZLoggerSilent();
-
-    const config = new ZBouncerConfigBuilder().domain(localhost).build();
-    _proxy = new ZBouncerServer(
-      config,
-      new ZBouncerCertGeneratorSelfSigned(logger),
-      logger,
-    );
-
-    await _proxy.start();
-
     _server8080 = createServer();
     _server8081 = createServer();
 
@@ -64,9 +54,6 @@ describe("Server", () => {
   afterAll(async () => {
     _server8080.close();
     _server8081.close();
-
-    await _proxy.stop();
-    await _proxy.stop();
   });
 
   function invokeEndpoint(which: "eighty-eighty" | "eighty-eighty-one") {
@@ -111,63 +98,87 @@ describe("Server", () => {
     });
   }
 
-  it("should mark the server started", async () => {
-    expect(await _proxy.running()).toBeTruthy();
-  });
+  describe("Https", () => {
+    const cert = new ZBouncerCertGeneratorSelfSigned(logger);
+    let _proxy: ZBouncerServerHttps;
 
-  describe("Missing config entry", () => {
-    it("should return a 404 error if no such mapping can be found", async () => {
-      // Arrange.
+    beforeAll(async () => {
+      _proxy = new ZBouncerServerHttps(config, cert, logger);
 
-      // Act.
-      const url = new ZUrlBuilder().hostname("local.zthunworks.com").build();
-      const request = new ZHttpRequestBuilder().get().url(url).build();
-      const actual = new ZHttpService().request(request);
-
-      // Assert.
-      await expect(actual).rejects.toEqual(
-        expect.objectContaining({ status: 404 }),
-      );
+      await _proxy.start();
+      await _proxy.start();
     });
 
-    it("should return a 404 error if the host is discovered but the path cannot be found", async () => {
-      // Arrange.
-      const url = new ZUrlBuilder().hostname("localhost").append("api").build();
-
-      // Act.
-      const request = new ZHttpRequestBuilder().url(url).get().build();
-      const actual = new ZHttpService().request(request);
-
-      // Assert.
-      await expect(actual).rejects.toEqual(
-        expect.objectContaining({ status: 404 }),
-      );
-    });
-  });
-
-  describe("Found config entry", () => {
-    it("should forward the request", async () => {
-      // Arrange.
-      const expected = "8080";
-
-      // Act.
-      const response = await invokeEndpoint("eighty-eighty");
-      const { data: actual } = response;
-
-      // Assert.
-      expect(actual).toEqual(expected);
+    afterAll(async () => {
+      await _proxy.stop();
+      await _proxy.stop();
     });
 
-    it("should forward the request to the correct path", async () => {
-      // Arrange.
-      const expected = "8081";
+    it("should mark the server started", async () => {
+      expect(await _proxy.running()).toBeTruthy();
+    });
 
-      // Act.
-      const response = await invokeEndpoint("eighty-eighty-one");
-      const { data: actual } = response;
+    describe("Missing config entry", () => {
+      it("should return a 404 error if no such mapping can be found", async () => {
+        // Arrange.
 
-      // Assert.
-      expect(actual).toEqual(expected);
+        // Act.
+        const url = new ZUrlBuilder()
+          .protocol("https")
+          .hostname("local.zthunworks.com")
+          .build();
+        const request = new ZHttpRequestBuilder().get().url(url).build();
+        const actual = new ZHttpService().request(request);
+
+        // Assert.
+        await expect(actual).rejects.toEqual(
+          expect.objectContaining({ status: 404 }),
+        );
+      });
+
+      it("should return a 404 error if the host is discovered but the path cannot be found", async () => {
+        // Arrange.
+        const url = new ZUrlBuilder()
+          .protocol("https")
+          .hostname("localhost")
+          .append("api")
+          .build();
+
+        // Act.
+        const request = new ZHttpRequestBuilder().url(url).get().build();
+        const actual = new ZHttpService().request(request);
+
+        // Assert.
+        await expect(actual).rejects.toEqual(
+          expect.objectContaining({ status: 404 }),
+        );
+      });
+    });
+
+    describe("Found config entry", () => {
+      it("should forward the request", async () => {
+        // Arrange.
+        const expected = "8080";
+
+        // Act.
+        const response = await invokeEndpoint("eighty-eighty");
+        const { data: actual } = response;
+
+        // Assert.
+        expect(actual).toEqual(expected);
+      });
+
+      it("should forward the request to the correct path", async () => {
+        // Arrange.
+        const expected = "8081";
+
+        // Act.
+        const response = await invokeEndpoint("eighty-eighty-one");
+        const { data: actual } = response;
+
+        // Assert.
+        expect(actual).toEqual(expected);
+      });
     });
   });
 });
