@@ -56,6 +56,7 @@ export class ZBouncerServer implements IZBouncerServer {
   public async stop(): Promise<void> {
     return new Promise<void>((resolve) => {
       if (this._server == null) {
+        resolve();
         return;
       }
 
