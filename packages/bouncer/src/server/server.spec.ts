@@ -155,7 +155,7 @@ describe("Server", () => {
         // Arrange.
         const url = new ZUrlBuilder()
           .protocol("https")
-          .hostname("local.zthunworks.com")
+          .hostname("127.0.0.1")
           .build();
 
         // Act.
