@@ -1,6 +1,11 @@
-import type { IZBouncerCertSecurity } from "./cert-security.mjs";
 import { type IZBouncerCert } from "./cert.mjs";
 
+/**
+ * Represents an factory that can generate a certificate.
+ */
 export interface IZBouncerCertGenerator {
-  generate(security: IZBouncerCertSecurity): Promise<IZBouncerCert>;
+  /**
+   * Generates the appropriate bouncer certificate.
+   */
+  generate(): Promise<IZBouncerCert>;
 }

@@ -16,17 +16,16 @@ import { ZBouncerCertBuilder, type IZBouncerCert } from "./cert.mjs";
 export class ZBouncerCertGeneratorSelfSigned implements IZBouncerCertGenerator {
   private _logger: IZLogger;
 
-  public constructor(logger: IZLogger) {
+  public constructor(
+    private readonly _security: IZBouncerCertSecurity,
+    logger: IZLogger,
+  ) {
     this._logger = new ZLoggerContext("ZBouncerCertGeneratorOpenSsl", logger);
   }
 
-  public async generate({
-    country,
-    state,
-    city,
-    organization,
-    domain,
-  }: IZBouncerCertSecurity): Promise<IZBouncerCert> {
+  public async generate(): Promise<IZBouncerCert> {
+    const { country, state, city, organization, domain } = this._security;
+
     const dir = resolve(tmpdir(), "zthunworks/bouncer/cert", createGuid());
     const stream = new ZStreamFolder();
 

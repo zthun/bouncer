@@ -1,20 +1,21 @@
 import { ZLoggerSilent } from "@zthun/lumberjacky-log";
 import { describe, expect, it } from "vitest";
 import { ZBouncerCertGeneratorSelfSigned } from "./cert-generator-self-signed.mjs";
+import type { IZBouncerCertSecurity } from "./cert-security.mjs";
 import { ZBouncerCertSecurityBuilder } from "./cert-security.mjs";
 
 describe("Cert Generator", () => {
   describe("Self Signed", () => {
-    const createTestTarget = () =>
-      new ZBouncerCertGeneratorSelfSigned(new ZLoggerSilent());
+    const createTestTarget = (security: IZBouncerCertSecurity) =>
+      new ZBouncerCertGeneratorSelfSigned(security, new ZLoggerSilent());
 
     it("should generate a cert if all config is valid", async () => {
       // Arrange.
       const security = new ZBouncerCertSecurityBuilder().build();
-      const target = createTestTarget();
+      const target = createTestTarget(security);
 
       // Act.
-      const { key, cert } = await target.generate(security);
+      const { key, cert } = await target.generate();
 
       // Assert.
       expect(key).toBeTruthy();
@@ -26,10 +27,10 @@ describe("Cert Generator", () => {
       const security = new ZBouncerCertSecurityBuilder()
         .country("TooLong")
         .build();
-      const target = createTestTarget();
+      const target = createTestTarget(security);
 
       // Act.
-      const actual = target.generate(security);
+      const actual = target.generate();
 
       // Assert.
       await expect(actual).rejects.toBeInstanceOf(Error);
