@@ -1,14 +1,12 @@
 import { firstDefined } from "@zthun/helpful-fn";
 import { ZLoggerSilent } from "@zthun/lumberjacky-log";
-import type { IZHttpResult } from "@zthun/webigail-http";
-import {
-  ZHttpCodeServer,
-  ZHttpCodeSuccess,
-  ZHttpResultBuilder,
-  ZHttpService,
-} from "@zthun/webigail-http";
 import { ZMimeTypeText, ZUrlBuilder } from "@zthun/webigail-url";
-import type { IncomingMessage, Server, ServerResponse } from "node:http";
+import type {
+  IncomingHttpHeaders,
+  IncomingMessage,
+  Server,
+  ServerResponse,
+} from "node:http";
 import { createServer } from "node:http";
 import type { RequestOptions } from "node:https";
 import { Agent, request } from "node:https";
@@ -28,12 +26,7 @@ describe("Server", () => {
     .path("/eighty-eighty-one", "http://localhost:8081")
     .build();
   const config = new ZBouncerConfigBuilder().domain(localhost).build();
-  const http = new ZHttpService();
-  const handler = new ZBouncerRequestHandlerForward(
-    config.domains,
-    http,
-    logger,
-  );
+  const handler = new ZBouncerRequestHandlerForward(config.domains, logger);
 
   let _server8080: Server;
   let _server8081: Server;
@@ -65,7 +58,11 @@ describe("Server", () => {
   });
 
   function invokeUrl(url: string) {
-    return new Promise<IZHttpResult>((res, rej) => {
+    return new Promise<{
+      status: number;
+      data: string;
+      headers: IncomingHttpHeaders;
+    }>((res, rej) => {
       const options: RequestOptions = {
         agent: new Agent({
           rejectUnauthorized: false,
@@ -81,19 +78,21 @@ describe("Server", () => {
         });
 
         msg.on("end", () => {
-          const result = new ZHttpResultBuilder(chunks)
-            .status(firstDefined(ZHttpCodeSuccess.OK, msg.statusCode))
-            .headers(msg.headers)
-            .build();
+          const result = {
+            status: firstDefined(200, msg.statusCode),
+            data: chunks,
+            headers: msg.headers,
+          };
           res(result);
         });
       });
 
       client.on("error", (err) => {
-        const result = new ZHttpResultBuilder(err.message)
-          .status(ZHttpCodeServer.InternalServerError)
-          .build();
-        rej(result);
+        rej({
+          status: 500,
+          data: err.message,
+          headers: {},
+        });
       });
 
       client.end();
