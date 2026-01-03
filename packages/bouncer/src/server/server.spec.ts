@@ -14,7 +14,10 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { ZBouncerCertGeneratorSelfSigned } from "../cert/cert-generator-self-signed.mjs";
 import { ZBouncerDomainBuilder } from "../config/config-domain.mjs";
 import { ZBouncerConfigBuilder } from "../config/config.mjs";
-import { ZBouncerRequestHandlerForward } from "../request/request-handler-forward.mjs";
+import {
+  HttpErrorBadGateway,
+  ZBouncerRequestHandlerForward,
+} from "../request/request-handler-forward.mjs";
 import { ZBouncerServerFactoryHttps } from "./node-server-factory-https.mjs";
 import { ZBouncerServer, type IZBouncerServer } from "./server.mjs";
 
@@ -24,6 +27,7 @@ describe("Server", () => {
     .host("localhost")
     .path("/eighty-eighty", "http://localhost:8080")
     .path("/eighty-eighty-one", "http://localhost:8081")
+    .path("/bad-gateway", "http://localhost:8082")
     .build();
   const config = new ZBouncerConfigBuilder().domain(localhost).build();
   const handler = new ZBouncerRequestHandlerForward(config.domains, logger);
@@ -99,7 +103,9 @@ describe("Server", () => {
     });
   }
 
-  function invokeEndpoint(which: "eighty-eighty" | "eighty-eighty-one") {
+  function invokeEndpoint(
+    which: "eighty-eighty" | "eighty-eighty-one" | "bad-gateway",
+  ) {
     return invokeUrl(
       new ZUrlBuilder()
         .protocol("https")
@@ -129,6 +135,19 @@ describe("Server", () => {
 
     it("should mark the server started", async () => {
       expect(await _proxy.running()).toBeTruthy();
+    });
+
+    it("should fail to create a server if the server is already running", async () => {
+      // Arrange.
+      const target = new ZBouncerServer(factory, logger);
+
+      // Act.
+      await target.start();
+      const actual = await target.running();
+      await target.stop();
+
+      // Assert.
+      expect(actual).toBeFalsy();
     });
 
     describe("Missing config entry", () => {
@@ -185,6 +204,17 @@ describe("Server", () => {
 
         // Assert.
         expect(actual).toEqual(expected);
+      });
+
+      it("should return a bad gateway error if the target server exists but cannot connect on the given port", async () => {
+        // Arrange.
+
+        // Act.
+        const response = await invokeEndpoint("bad-gateway");
+        const { status } = response;
+
+        // Assert.
+        expect(status).toEqual(HttpErrorBadGateway);
       });
     });
   });
