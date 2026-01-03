@@ -1,4 +1,4 @@
-export interface IZBouncerCertSecurity {
+export interface IZBouncerConfigSecurity {
   organization: string;
   country: string;
   state: string;
@@ -7,8 +7,8 @@ export interface IZBouncerCertSecurity {
   domain: string;
 }
 
-export class ZBouncerCertSecurityBuilder {
-  private _security: IZBouncerCertSecurity;
+export class ZBouncerConfigSecurityBuilder {
+  private _security: IZBouncerConfigSecurity;
 
   public constructor() {
     this._security = {
