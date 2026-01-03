@@ -25,7 +25,10 @@ describe("ZBouncerConfig", () => {
   });
 
   describe("Https", () => {
-    const security = new ZBouncerConfigSecurityBuilder().country("EU").build();
+    const security = new ZBouncerConfigSecurityBuilder()
+      .country("EU")
+      .organization("Zthunworks")
+      .build();
 
     it("should add a new configuration", () => {
       // Arrange.
