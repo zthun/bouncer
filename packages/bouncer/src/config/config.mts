@@ -1,10 +1,10 @@
 import { merge } from "lodash-es";
 import type { IZBouncerDomain } from "./config-domain.mjs";
-import type { IZBouncerConfigSecurity } from "./config-security.mjs";
-import { ZBouncerConfigSecurityBuilder } from "./config-security.mjs";
+import type { IZBouncerSecurity } from "./config-security.mjs";
+import { ZBouncerSecurityBuilder } from "./config-security.mjs";
 
 export interface IZBouncerConfig {
-  security: IZBouncerConfigSecurity;
+  security: IZBouncerSecurity;
   domains: IZBouncerDomain[];
 }
 
@@ -14,7 +14,7 @@ export class ZBouncerConfigBuilder {
   public constructor() {
     this._config = {
       domains: [],
-      security: new ZBouncerConfigSecurityBuilder().build(),
+      security: new ZBouncerSecurityBuilder().build(),
     };
   }
 
