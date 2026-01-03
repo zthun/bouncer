@@ -4,8 +4,12 @@ import {
   ZLoggerContext,
   type IZLogger,
 } from "@zthun/lumberjacky-log";
-import { ZHttpRequestBuilder, type IZHttpService } from "@zthun/webigail-http";
-import { find } from "lodash-es";
+import {
+  ZHttpCodeServer,
+  ZHttpRequestBuilder,
+  type IZHttpService,
+} from "@zthun/webigail-http";
+import { find, get } from "lodash-es";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import type { IZBouncerDomain } from "../config/config-domain.mjs";
 import type { IZBouncerRequestHandler } from "./request-handler.mjs";
@@ -53,6 +57,14 @@ export class ZBouncerRequestHandlerForward implements IZBouncerRequestHandler {
     return firstDefined(null, mapping);
   }
 
+  private _castHeaders(headers: Record<string, any>) {
+    type HeaderValue = number | string | readonly string[];
+    type Header = [string, HeaderValue];
+
+    const pairs = Object.keys(headers).map<Header>((k) => [k, headers[k]]);
+    return new Map(pairs);
+  }
+
   public handle(req: IncomingMessage, res: ServerResponse) {
     const path = firstDefined("/", req.url);
     const host = req.headers.host;
@@ -77,14 +89,24 @@ export class ZBouncerRequestHandlerForward implements IZBouncerRequestHandler {
       .headers(req.headers as Record<string, string>)
       .build();
 
-    this._forward.request(request).then((r) => {
-      type HeaderValue = number | string | readonly string[];
-      type Header = [string, HeaderValue];
+    this._forward
+      .request(request)
+      .then((r) => {
+        res
+          .setHeaders(this._castHeaders(r.headers))
+          .writeHead(r.status)
+          .end(r.data);
+      })
+      .catch((reason) => {
+        const status = get(
+          reason,
+          "status",
+          ZHttpCodeServer.InternalServerError,
+        );
 
-      const pairs = Object.keys(r).map<Header>((k) => [k, r[k]]);
-      const headers = new Map(pairs);
+        const headers = get(reason, "headers", {});
 
-      res.setHeaders(headers).writeHead(r.status).end(r.data);
-    });
+        res.setHeaders(this._castHeaders(headers)).writeHead(status).end();
+      });
   }
 }
