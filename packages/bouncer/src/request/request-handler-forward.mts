@@ -54,11 +54,11 @@ export class ZBouncerRequestHandlerForward implements IZBouncerRequestHandler {
   }
 
   public handle(req: IncomingMessage, res: ServerResponse) {
-    let msg = `Received a request for ${req.url}`;
-    this._logger.log(new ZLogEntryBuilder().info().message(msg).build());
-
     const path = firstDefined("/", req.url);
     const host = req.headers.host;
+
+    let msg = `Received a request for ${host} - ${path}`;
+    this._logger.log(new ZLogEntryBuilder().info().message(msg).build());
     const url = this._findRoute(host, path);
 
     if (!url) {
