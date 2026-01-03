@@ -5,13 +5,13 @@ import {
   type IZLogger,
 } from "@zthun/lumberjacky-log";
 import fetch from "cross-fetch";
-import { castArray, find, get } from "lodash-es";
+import { castArray, get } from "lodash-es";
 import type {
   IncomingHttpHeaders,
   IncomingMessage,
   ServerResponse,
 } from "node:http";
-import type { IZBouncerConfigDomain } from "../config/config-domain.mjs";
+import type { ZBouncerDomainMap } from "../config/config-server.mjs";
 import type { IZBouncerRequestHandler } from "./request-handler.mjs";
 
 /**
@@ -54,25 +54,20 @@ export class ZBouncerRequestHandlerForward implements IZBouncerRequestHandler {
    *        The domain configurations to forward to.
    */
   public constructor(
-    private readonly _domains: IZBouncerConfigDomain[],
+    private readonly _domains: ZBouncerDomainMap,
     logger: IZLogger,
   ) {
     this._logger = new ZLoggerContext("ZBouncerRequestHandlerForward", logger);
   }
 
-  private _findRoute(
-    host: string | undefined,
-    pathname: string,
-  ): string | null {
-    const target = find(this._domains, (d) => d.host === host);
+  private _findRoute(host: string, pathname: string): string | null {
+    const target = this._domains[host];
 
     if (target == null) {
       return null;
     }
 
-    const { paths } = target;
-
-    const mapping = paths[pathname];
+    const mapping = target[pathname];
 
     return firstDefined(null, mapping);
   }
@@ -96,7 +91,7 @@ export class ZBouncerRequestHandlerForward implements IZBouncerRequestHandler {
 
     let msg = `Received a request for ${host} - ${path}`;
     this._logger.log(new ZLogEntryBuilder().info().message(msg).build());
-    const url = this._findRoute(host, path);
+    const url = this._findRoute(firstDefined("", host), path);
 
     if (!url) {
       msg = `No mapping exists for ${req.url}`;

@@ -12,8 +12,7 @@ import type { RequestOptions } from "node:https";
 import { Agent, request } from "node:https";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { ZBouncerCertGeneratorSelfSigned } from "../cert/cert-generator-self-signed.mjs";
-import { ZBouncerConfigDomainBuilder } from "../config/config-domain.mjs";
-import { ZBouncerConfigBuilder } from "../config/config.mjs";
+import { ZBouncerConfigServerBuilder } from "../config/config-server.mjs";
 import {
   HttpErrorBadGateway,
   ZBouncerRequestHandlerForward,
@@ -23,14 +22,14 @@ import { ZBouncerServer, type IZBouncerServer } from "./server.mjs";
 
 describe("Server", () => {
   const logger = new ZLoggerSilent();
-  const localhost = new ZBouncerConfigDomainBuilder()
-    .host("localhost")
-    .path("/eighty-eighty", "http://localhost:8080")
-    .path("/eighty-eighty-one", "http://localhost:8081")
-    .path("/bad-gateway", "http://localhost:8082")
-    .build();
-  const config = new ZBouncerConfigBuilder().domain(localhost).build();
-  const handler = new ZBouncerRequestHandlerForward(config.domains, logger);
+  const domains = {
+    localhost: {
+      "/eighty-eighty": "http://localhost:8080",
+      "/eighty-eighty-one": "http://localhost:8081",
+      "/bad-gateway": "http://localhost:8082",
+      "/shut-it-down": null,
+    },
+  };
 
   let _server8080: Server;
   let _server8081: Server;
@@ -103,9 +102,7 @@ describe("Server", () => {
     });
   }
 
-  function invokeEndpoint(
-    which: "eighty-eighty" | "eighty-eighty-one" | "bad-gateway",
-  ) {
+  function invokeEndpoint(which: keyof typeof domains.localhost) {
     return invokeUrl(
       new ZUrlBuilder()
         .protocol("https")
@@ -116,6 +113,8 @@ describe("Server", () => {
   }
 
   describe("Https", () => {
+    const config = new ZBouncerConfigServerBuilder().domains(domains).build();
+    const handler = new ZBouncerRequestHandlerForward(config.domains, logger);
     const cert = new ZBouncerCertGeneratorSelfSigned(config.security, logger);
     const factory = new ZBouncerServerFactoryHttps(cert, handler);
 
@@ -187,7 +186,7 @@ describe("Server", () => {
         const expected = "8080";
 
         // Act.
-        const response = await invokeEndpoint("eighty-eighty");
+        const response = await invokeEndpoint("/eighty-eighty");
         const { data: actual } = response;
 
         // Assert.
@@ -199,7 +198,7 @@ describe("Server", () => {
         const expected = "8081";
 
         // Act.
-        const response = await invokeEndpoint("eighty-eighty-one");
+        const response = await invokeEndpoint("/eighty-eighty-one");
         const { data: actual } = response;
 
         // Assert.
@@ -210,11 +209,22 @@ describe("Server", () => {
         // Arrange.
 
         // Act.
-        const response = await invokeEndpoint("bad-gateway");
+        const response = await invokeEndpoint("/bad-gateway");
         const { status } = response;
 
         // Assert.
         expect(status).toEqual(HttpErrorBadGateway);
+      });
+
+      it("should return a 404 if the api path is shut down (to points to falsy)", async () => {
+        // Arrange.
+
+        // Act.
+        const response = await invokeEndpoint("/shut-it-down");
+        const { status } = response;
+
+        // Assert.
+        expect(status).toEqual(404);
       });
     });
   });

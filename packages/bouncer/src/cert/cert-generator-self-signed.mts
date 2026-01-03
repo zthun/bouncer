@@ -9,7 +9,7 @@ import { spawnSync } from "node:child_process";
 import { readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
-import type { IZBouncerConfigSecurity } from "../config/config-security.mjs";
+import { ZBouncerConfigSecurityBuilder } from "../config/config-security.mjs";
 import type { IZBouncerCertGenerator } from "./cert-generator.mjs";
 import { ZBouncerCertBuilder, type IZBouncerCert } from "./cert.mjs";
 
@@ -17,7 +17,7 @@ export class ZBouncerCertGeneratorSelfSigned implements IZBouncerCertGenerator {
   private _logger: IZLogger;
 
   public constructor(
-    private readonly _security: IZBouncerConfigSecurity,
+    private readonly _security = new ZBouncerConfigSecurityBuilder().build(),
     logger: IZLogger,
   ) {
     this._logger = new ZLoggerContext("ZBouncerCertGeneratorOpenSsl", logger);
