@@ -1,10 +1,10 @@
-export interface IZBouncerDomain {
+export interface IZBouncerConfigDomain {
   host: string;
   paths: Record<string, string>;
 }
 
-export class ZBouncerDomainBuilder {
-  private _domain: IZBouncerDomain;
+export class ZBouncerConfigDomainBuilder {
+  private _domain: IZBouncerConfigDomain;
 
   public constructor() {
     this._domain = {

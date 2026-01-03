@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { ZBouncerDomainBuilder } from "./config-domain.mjs";
-import { ZBouncerSecurityBuilder } from "./config-security.mjs";
+import { ZBouncerConfigDomainBuilder } from "./config-domain.mjs";
+import { ZBouncerConfigSecurityBuilder } from "./config-security.mjs";
 import type { IZBouncerConfig } from "./config.mjs";
 import { ZBouncerConfigBuilder } from "./config.mjs";
 
@@ -11,7 +11,7 @@ describe("ZProxyConfig", () => {
     it("should assign domains without blowing away security", () => {
       // Arrange.
       const domains = [
-        new ZBouncerDomainBuilder()
+        new ZBouncerConfigDomainBuilder()
           .host("zthunworks.com")
           .path("/", "localhost:8081")
           .build(),
@@ -32,7 +32,7 @@ describe("ZProxyConfig", () => {
       // Arrange.
       const organization = "Foobar";
       const email = "foo@bar.com";
-      const security = new ZBouncerSecurityBuilder()
+      const security = new ZBouncerConfigSecurityBuilder()
         .organization(organization)
         .email(email)
         .build();

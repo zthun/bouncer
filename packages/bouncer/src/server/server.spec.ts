@@ -12,7 +12,7 @@ import type { RequestOptions } from "node:https";
 import { Agent, request } from "node:https";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { ZBouncerCertGeneratorSelfSigned } from "../cert/cert-generator-self-signed.mjs";
-import { ZBouncerDomainBuilder } from "../config/config-domain.mjs";
+import { ZBouncerConfigDomainBuilder } from "../config/config-domain.mjs";
 import { ZBouncerConfigBuilder } from "../config/config.mjs";
 import {
   HttpErrorBadGateway,
@@ -23,7 +23,7 @@ import { ZBouncerServer, type IZBouncerServer } from "./server.mjs";
 
 describe("Server", () => {
   const logger = new ZLoggerSilent();
-  const localhost = new ZBouncerDomainBuilder()
+  const localhost = new ZBouncerConfigDomainBuilder()
     .host("localhost")
     .path("/eighty-eighty", "http://localhost:8080")
     .path("/eighty-eighty-one", "http://localhost:8081")

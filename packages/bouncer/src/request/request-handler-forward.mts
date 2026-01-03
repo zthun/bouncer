@@ -11,7 +11,7 @@ import type {
   IncomingMessage,
   ServerResponse,
 } from "node:http";
-import type { IZBouncerDomain } from "../config/config-domain.mjs";
+import type { IZBouncerConfigDomain } from "../config/config-domain.mjs";
 import type { IZBouncerRequestHandler } from "./request-handler.mjs";
 
 /**
@@ -54,7 +54,7 @@ export class ZBouncerRequestHandlerForward implements IZBouncerRequestHandler {
    *        The domain configurations to forward to.
    */
   public constructor(
-    private readonly _domains: IZBouncerDomain[],
+    private readonly _domains: IZBouncerConfigDomain[],
     logger: IZLogger,
   ) {
     this._logger = new ZLoggerContext("ZBouncerRequestHandlerForward", logger);
