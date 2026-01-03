@@ -5,7 +5,7 @@ import {
   type IZLogger,
 } from "@zthun/lumberjacky-log";
 import fetch from "cross-fetch";
-import { find, get } from "lodash-es";
+import { castArray, find, get } from "lodash-es";
 import type {
   IncomingHttpHeaders,
   IncomingMessage,
@@ -64,10 +64,6 @@ export class ZBouncerRequestHandlerForward implements IZBouncerRequestHandler {
     host: string | undefined,
     pathname: string,
   ): string | null {
-    if (!host) {
-      return null;
-    }
-
     const target = find(this._domains, (d) => d.host === host);
 
     if (target == null) {
@@ -87,11 +83,8 @@ export class ZBouncerRequestHandlerForward implements IZBouncerRequestHandler {
     Object.entries(headers)
       .filter(([key, value]) => key.toLowerCase() !== "host" && value != null)
       .forEach(([key, value]) => {
-        if (Array.isArray(value)) {
-          value.forEach((item) => forward.append(key, String(item)));
-        } else {
-          forward.set(key, String(value));
-        }
+        const values = castArray(value);
+        values.forEach((item) => forward.append(key, String(item)));
       });
 
     return forward;
