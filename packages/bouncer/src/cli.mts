@@ -9,10 +9,10 @@ import { ZBouncerServer } from "./server/server.mjs";
 (async function main() {
   const explorer = new ZBouncerConfigSearch();
   const config = await explorer.search();
-  const { security } = config;
+  const { security, domains } = config;
 
   const forward = new ZHttpService();
-  const handler = new ZBouncerRequestHandlerForward(config, forward);
+  const handler = new ZBouncerRequestHandlerForward(domains, forward);
   const logger = new ZLoggerConsole(console);
   const generator = new ZBouncerCertGeneratorSelfSigned(security, logger);
   const factory = new ZBouncerServerFactoryHttps(generator, handler);

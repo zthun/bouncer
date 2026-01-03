@@ -29,7 +29,7 @@ describe("Server", () => {
     .build();
   const config = new ZBouncerConfigBuilder().domain(localhost).build();
   const http = new ZHttpService();
-  const handler = new ZBouncerRequestHandlerForward(config, http);
+  const handler = new ZBouncerRequestHandlerForward(config.domains, http);
 
   let _server8080: Server;
   let _server8081: Server;

@@ -2,7 +2,7 @@ import { firstDefined } from "@zthun/helpful-fn";
 import { ZHttpRequestBuilder, type IZHttpService } from "@zthun/webigail-http";
 import { find } from "lodash-es";
 import type { IncomingMessage, ServerResponse } from "node:http";
-import type { IZBouncerConfig } from "../config/config.mjs";
+import type { IZBouncerDomain } from "../config/config-domain.mjs";
 import type { IZBouncerRequestHandler } from "./request-handler.mjs";
 
 /**
@@ -12,13 +12,13 @@ export class ZBouncerRequestHandlerForward implements IZBouncerRequestHandler {
   /**
    * Initializes a new instance of this object.
    *
-   * @param _config -
-   *        The server configuration.
+   * @param _domains -
+   *        The domain configurations to forward to.
    * @param _forward -
    *        The http service that will forward the request.
    */
   public constructor(
-    private readonly _config: IZBouncerConfig,
+    private readonly _domains: IZBouncerDomain[],
     private readonly _forward: IZHttpService,
   ) {}
 
@@ -30,9 +30,7 @@ export class ZBouncerRequestHandlerForward implements IZBouncerRequestHandler {
       return null;
     }
 
-    const { domains } = this._config;
-
-    const target = find(domains, (d) => d.host === host);
+    const target = find(this._domains, (d) => d.host === host);
 
     if (target == null) {
       return null;
