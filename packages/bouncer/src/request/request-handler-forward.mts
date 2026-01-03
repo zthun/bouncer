@@ -1,4 +1,9 @@
 import { firstDefined } from "@zthun/helpful-fn";
+import {
+  ZLogEntryBuilder,
+  ZLoggerContext,
+  type IZLogger,
+} from "@zthun/lumberjacky-log";
 import { ZHttpRequestBuilder, type IZHttpService } from "@zthun/webigail-http";
 import { find } from "lodash-es";
 import type { IncomingMessage, ServerResponse } from "node:http";
@@ -9,6 +14,8 @@ import type { IZBouncerRequestHandler } from "./request-handler.mjs";
  * A request handler that forwards request to different domain endpoints.
  */
 export class ZBouncerRequestHandlerForward implements IZBouncerRequestHandler {
+  private _logger: IZLogger;
+
   /**
    * Initializes a new instance of this object.
    *
@@ -20,7 +27,10 @@ export class ZBouncerRequestHandlerForward implements IZBouncerRequestHandler {
   public constructor(
     private readonly _domains: IZBouncerDomain[],
     private readonly _forward: IZHttpService,
-  ) {}
+    logger: IZLogger,
+  ) {
+    this._logger = new ZLoggerContext("ZBouncerRequestHandlerForward", logger);
+  }
 
   private _findRoute(
     host: string | undefined,
@@ -44,14 +54,23 @@ export class ZBouncerRequestHandlerForward implements IZBouncerRequestHandler {
   }
 
   public handle(req: IncomingMessage, res: ServerResponse) {
+    let msg = `Received a request for ${req.url}`;
+    this._logger.log(new ZLogEntryBuilder().info().message(msg).build());
+
     const path = firstDefined("/", req.url);
     const host = req.headers.host;
     const url = this._findRoute(host, path);
 
     if (!url) {
+      msg = `No mapping exists for ${req.url}`;
+      this._logger.log(new ZLogEntryBuilder().warning().message(msg).build());
+
       res.writeHead(404).end("Not Found");
       return;
     }
+
+    msg = `Forwarding to ${url}.`;
+    this._logger.log(new ZLogEntryBuilder().info().message(msg).build());
 
     const request = new ZHttpRequestBuilder()
       .url(url)

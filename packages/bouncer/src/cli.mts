@@ -7,13 +7,13 @@ import { ZBouncerServerFactoryHttps } from "./server/node-server-factory-https.m
 import { ZBouncerServer } from "./server/server.mjs";
 
 (async function main() {
+  const logger = new ZLoggerConsole(console);
+  const forward = new ZHttpService();
   const explorer = new ZBouncerConfigSearch();
   const config = await explorer.search();
   const { security, domains } = config;
 
-  const forward = new ZHttpService();
-  const handler = new ZBouncerRequestHandlerForward(domains, forward);
-  const logger = new ZLoggerConsole(console);
+  const handler = new ZBouncerRequestHandlerForward(domains, forward, logger);
   const generator = new ZBouncerCertGeneratorSelfSigned(security, logger);
   const factory = new ZBouncerServerFactoryHttps(generator, handler);
   const servers = [new ZBouncerServer(factory, logger)];
