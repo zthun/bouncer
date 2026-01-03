@@ -3,7 +3,6 @@ export interface IZBouncerConfigSecurity {
   country: string;
   state: string;
   city: string;
-  email: string;
   domain: string;
 }
 
@@ -16,7 +15,6 @@ export class ZBouncerConfigSecurityBuilder {
       country: "US",
       state: "California",
       city: "Irvine",
-      email: "admin@dev-proxy.org",
       domain: "localhost",
     };
   }
@@ -33,8 +31,14 @@ export class ZBouncerConfigSecurityBuilder {
     return this;
   }
 
-  public email(val: string) {
-    this._security.email = val;
+  public copy(other: IZBouncerConfigSecurity) {
+    this._security = structuredClone(other);
+
+    return this;
+  }
+
+  public assign(other: Partial<IZBouncerConfigSecurity>) {
+    this._security = { ...this._security, ...other };
 
     return this;
   }
