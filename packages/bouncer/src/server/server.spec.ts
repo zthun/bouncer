@@ -5,6 +5,7 @@ import {
   ZHttpCodeServer,
   ZHttpCodeSuccess,
   ZHttpResultBuilder,
+  ZHttpService,
 } from "@zthun/webigail-http";
 import { ZMimeTypeText, ZUrlBuilder } from "@zthun/webigail-url";
 import type { IncomingMessage, Server, ServerResponse } from "node:http";
@@ -15,7 +16,9 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { ZBouncerCertGeneratorSelfSigned } from "../cert/cert-generator-self-signed.mjs";
 import { ZBouncerDomainBuilder } from "../config/config-domain.mjs";
 import { ZBouncerConfigBuilder } from "../config/config.mjs";
-import { ZBouncerServerHttps } from "./server-https.mjs";
+import { ZBouncerRequestHandlerForward } from "../request/request-handler-forward.mjs";
+import { ZBouncerServerFactoryHttps } from "./node-server-factory-https.mjs";
+import { ZBouncerServer, type IZBouncerServer } from "./server.mjs";
 
 describe("Server", () => {
   const logger = new ZLoggerSilent();
@@ -25,6 +28,8 @@ describe("Server", () => {
     .path("/eighty-eighty-one", "http://localhost:8081")
     .build();
   const config = new ZBouncerConfigBuilder().domain(localhost).build();
+  const http = new ZHttpService();
+  const handler = new ZBouncerRequestHandlerForward(config, http);
 
   let _server8080: Server;
   let _server8081: Server;
@@ -38,8 +43,9 @@ describe("Server", () => {
       _: IncomingMessage,
       res: ServerResponse,
     ) => {
-      res.writeHead(200, { "content-type": ZMimeTypeText.Plain });
-      res.end(String(port));
+      res
+        .writeHead(200, { "content-type": ZMimeTypeText.Plain })
+        .end(String(port));
     };
 
     _server8080.on("request", writeBackPort.bind(null, 8080));
@@ -101,11 +107,13 @@ describe("Server", () => {
   }
 
   describe("Https", () => {
-    const cert = new ZBouncerCertGeneratorSelfSigned(logger);
-    let _proxy: ZBouncerServerHttps;
+    const cert = new ZBouncerCertGeneratorSelfSigned(config.security, logger);
+    const factory = new ZBouncerServerFactoryHttps(cert, handler);
+
+    let _proxy: IZBouncerServer;
 
     beforeAll(async () => {
-      _proxy = new ZBouncerServerHttps(config, cert, logger);
+      _proxy = new ZBouncerServer(factory, logger);
 
       await _proxy.start();
       await _proxy.start();
