@@ -1,14 +1,22 @@
 import { ZLoggerConsole } from "@zthun/lumberjacky-log";
+import { ZHttpService } from "@zthun/webigail-http";
 import { ZBouncerCertGeneratorSelfSigned } from "./cert/cert-generator-self-signed.mjs";
 import { ZBouncerConfigSearch } from "./config/config-search.mjs";
-import { ZBouncerServerHttps } from "./server/server-https.mjs";
+import { ZBouncerRequestHandlerForward } from "./request/request-handler-forward.mjs";
+import { ZBouncerServerFactoryHttps } from "./server/node-server-factory-https.mjs";
+import { ZBouncerServer } from "./server/server.mjs";
 
 (async function main() {
-  const logger = new ZLoggerConsole(console);
-  const generator = new ZBouncerCertGeneratorSelfSigned(logger);
   const explorer = new ZBouncerConfigSearch();
   const config = await explorer.search();
-  const servers = [new ZBouncerServerHttps(config, generator, logger)];
+  const { security } = config;
+
+  const forward = new ZHttpService();
+  const handler = new ZBouncerRequestHandlerForward(config, forward);
+  const logger = new ZLoggerConsole(console);
+  const generator = new ZBouncerCertGeneratorSelfSigned(security, logger);
+  const factory = new ZBouncerServerFactoryHttps(generator, handler);
+  const servers = [new ZBouncerServer(factory, logger)];
 
   await Promise.all(servers.map((s) => s.start()));
 })();
