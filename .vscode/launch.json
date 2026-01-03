@@ -11,6 +11,18 @@
       "program": "${workspaceFolder}/packages/bouncer/src/main.mts",
       "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/tsx",
       "internalConsoleOptions": "openOnSessionStart"
+    },
+    {
+      "name": "Attach Proxy",
+      "type": "node",
+      "request": "attach",
+      "port": 9229,
+      "address": "0.0.0.0",
+      "remoteRoot": "/usr/dev",
+      "localRoot": "${workspaceFolder}",
+      "sourceMapPathOverrides": {
+        "/usr/dev/*": "${workspaceRoot}/*"
+      }
     }
   ]
 }
