@@ -350,14 +350,29 @@ describe("Handler Forward", () => {
     });
   });
 
+  describe("Query String", () => {
+    it("should ignore (but preserve) the query string when trying to find the routes", async () => {
+      // Arrange.
+      const query = "foo=bar&alpha=beta&orange=3";
+      const url = `https://localhost/eighty-eighty?${query}`;
+      const expected = `/eighty-eighty?${query}--8080`;
+
+      // Act.
+      const actual = await invokeUrl(url);
+
+      // Assert.
+      expect(actual.status).toEqual(200);
+      expect(actual.data).toEqual(expected);
+    });
+  });
+
   describe("Body", () => {
     it("should send the body", async () => {
       // Arrange.
       const expected = JSON.stringify({ foo: "bar" });
 
       // Act.
-      const response = await invokeEndpoint("/echo", "POST", expected);
-      const actual = response;
+      const actual = await invokeEndpoint("/echo", "POST", expected);
 
       // Assert.
       expect(actual.status).toEqual(200);

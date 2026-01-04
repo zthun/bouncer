@@ -73,8 +73,10 @@ export class ZBouncerRequestHandlerForward implements IZBouncerRequestHandler {
       return null;
     }
 
-    const normalized = pathname.split("/").filter(Boolean).join("/");
+    const [_path, _query] = pathname.split("?");
+    const normalized = _path.split("/").filter(Boolean).join("/");
     const path = `/${normalized}`;
+    const query = _query?.length ? `?${_query}` : "";
 
     for (let cursor = path; ; ) {
       const mapped = target[cursor];
@@ -88,7 +90,7 @@ export class ZBouncerRequestHandlerForward implements IZBouncerRequestHandler {
 
       if (mapped != null) {
         const base = mapped.replace(/\/$/, "");
-        return `${base}${path}`;
+        return `${base}${path}${query}`;
       }
 
       if (cursor === "/") {
