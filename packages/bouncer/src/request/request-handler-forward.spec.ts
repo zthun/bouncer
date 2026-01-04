@@ -20,7 +20,7 @@ import {
 import { ZBouncerNodeServerFactoryHttps } from "../server/node-server-factory-https.mjs";
 import { ZBouncerServer, type IZBouncerServer } from "../server/server.mjs";
 
-describe("Handler", () => {
+describe("Handler Forward", () => {
   const logger = new ZLoggerSilent();
   const domains = {
     localhost: {
@@ -219,173 +219,171 @@ describe("Handler", () => {
     );
   }
 
-  describe("Forward", () => {
-    describe("Missing config entry", () => {
-      it("should return a 404 error if no such mapping can be found", async () => {
-        // Arrange.
-        const url = new ZUrlBuilder()
+  describe("Missing config entry", () => {
+    it("should return a 404 error if no such mapping can be found", async () => {
+      // Arrange.
+      const url = new ZUrlBuilder()
+        .protocol("https")
+        .hostname("127.0.0.1")
+        .build();
+
+      // Act.
+      const actual = invokeUrl(url);
+
+      // Assert.
+      await expect(actual).resolves.toEqual(
+        expect.objectContaining({ status: 404 }),
+      );
+    });
+
+    it("should return a 404 error if the host is discovered but the path cannot be found", async () => {
+      // Arrange.
+      const url = "https://localhost/api";
+
+      // Act.
+      const actual = invokeUrl(url);
+
+      // Assert.
+      await expect(actual).resolves.toEqual(
+        expect.objectContaining({ status: 404 }),
+      );
+    });
+  });
+
+  describe("Found config entry", () => {
+    it("should forward the request", async () => {
+      // Arrange.
+      const expected = "/eighty-eighty--8080";
+
+      // Act.
+      const response = await invokeEndpoint("/eighty-eighty");
+      const { data: actual } = response;
+
+      // Assert.
+      expect(actual).toEqual(expected);
+    });
+
+    it("should forward the request to the correct path", async () => {
+      // Arrange.
+      const expected = "/eighty-eighty-one--8081";
+
+      // Act.
+      const response = await invokeEndpoint("/eighty-eighty-one");
+      const { data: actual } = response;
+
+      // Assert.
+      expect(actual).toEqual(expected);
+    });
+
+    it("should include the entire path once matched", async () => {
+      // Arrange.
+      const path = `/eighty-eighty/some/more/routing`;
+      const expected = `${path}--8080`;
+
+      // Act.
+      const response = await invokeUrl(
+        new ZUrlBuilder()
           .protocol("https")
-          .hostname("127.0.0.1")
-          .build();
+          .hostname("localhost")
+          .path(path)
+          .build(),
+      );
+      const { data: actual } = response;
 
-        // Act.
-        const actual = invokeUrl(url);
-
-        // Assert.
-        await expect(actual).resolves.toEqual(
-          expect.objectContaining({ status: 404 }),
-        );
-      });
-
-      it("should return a 404 error if the host is discovered but the path cannot be found", async () => {
-        // Arrange.
-        const url = "https://localhost/api";
-
-        // Act.
-        const actual = invokeUrl(url);
-
-        // Assert.
-        await expect(actual).resolves.toEqual(
-          expect.objectContaining({ status: 404 }),
-        );
-      });
+      // Assert.
+      expect(actual).toEqual(expected);
     });
 
-    describe("Found config entry", () => {
-      it("should forward the request", async () => {
-        // Arrange.
-        const expected = "/eighty-eighty--8080";
+    it("should only match path segments, not partial paths", async () => {
+      // Arrange.
+      const path = `/eighty-eighty/api-x`;
+      // Note: the / path is matched on 8080, so the 8080 path should be hit.
+      const expected = "/eighty-eighty/api-x--8080";
 
-        // Act.
-        const response = await invokeEndpoint("/eighty-eighty");
-        const { data: actual } = response;
+      // Act.
+      const response = await invokeUrl(
+        new ZUrlBuilder()
+          .protocol("https")
+          .hostname("localhost")
+          .path(path)
+          .build(),
+      );
+      const { data: actual } = response;
 
-        // Assert.
-        expect(actual).toEqual(expected);
-      });
-
-      it("should forward the request to the correct path", async () => {
-        // Arrange.
-        const expected = "/eighty-eighty-one--8081";
-
-        // Act.
-        const response = await invokeEndpoint("/eighty-eighty-one");
-        const { data: actual } = response;
-
-        // Assert.
-        expect(actual).toEqual(expected);
-      });
-
-      it("should include the entire path once matched", async () => {
-        // Arrange.
-        const path = `/eighty-eighty/some/more/routing`;
-        const expected = `${path}--8080`;
-
-        // Act.
-        const response = await invokeUrl(
-          new ZUrlBuilder()
-            .protocol("https")
-            .hostname("localhost")
-            .path(path)
-            .build(),
-        );
-        const { data: actual } = response;
-
-        // Assert.
-        expect(actual).toEqual(expected);
-      });
-
-      it("should only match path segments, not partial paths", async () => {
-        // Arrange.
-        const path = `/eighty-eighty/api-x`;
-        // Note: the / path is matched on 8080, so the 8080 path should be hit.
-        const expected = "/eighty-eighty/api-x--8080";
-
-        // Act.
-        const response = await invokeUrl(
-          new ZUrlBuilder()
-            .protocol("https")
-            .hostname("localhost")
-            .path(path)
-            .build(),
-        );
-        const { data: actual } = response;
-
-        // Assert.
-        expect(actual).toEqual(expected);
-      });
-
-      it("should normalize the paths", async () => {
-        // Arrange.
-        const url = "https://localhost//////eighty-eighty-one/////";
-        const expected = "/eighty-eighty-one--8081";
-
-        // Act.
-        const response = await invokeUrl(url);
-        const { data: actual } = response;
-
-        // Assert.
-        expect(actual).toEqual(expected);
-      });
-
-      it("should return a bad gateway error if the target server exists but cannot connect on the given port", async () => {
-        // Arrange.
-
-        // Act.
-        const response = await invokeEndpoint("/bad-gateway");
-        const { status } = response;
-
-        // Assert.
-        expect(status).toEqual(HttpErrorBadGateway);
-      });
-
-      it("should return a 404 if the api path is shut down (to points to falsy)", async () => {
-        // Arrange.
-
-        // Act.
-        const response = await invokeEndpoint("/shut-it-down");
-        const { status } = response;
-
-        // Assert.
-        expect(status).toEqual(404);
-      });
+      // Assert.
+      expect(actual).toEqual(expected);
     });
 
-    describe("Body", () => {
-      it("should send the body", async () => {
-        // Arrange.
-        const expected = JSON.stringify({ foo: "bar" });
+    it("should normalize the paths", async () => {
+      // Arrange.
+      const url = "https://localhost//////eighty-eighty-one/////";
+      const expected = "/eighty-eighty-one--8081";
 
-        // Act.
-        const response = await invokeEndpoint("/echo", "POST", expected);
-        const actual = response;
+      // Act.
+      const response = await invokeUrl(url);
+      const { data: actual } = response;
 
-        // Assert.
-        expect(actual.status).toEqual(200);
-        expect(actual.data).toEqual(expected);
-      });
-
-      it("should at least send back the status code of 204 if no body is provided", async () => {
-        // Arrange.
-
-        // Act.
-        const { status: actual } = await invokeEndpoint("/no-body");
-
-        // Assert.
-        expect(actual).toEqual(204);
-      });
+      // Assert.
+      expect(actual).toEqual(expected);
     });
 
-    describe("Error", () => {
-      it("should return a 502 (bad gateway) error if there is a failure when writing back the stream", async () => {
-        // Arrange.
+    it("should return a bad gateway error if the target server exists but cannot connect on the given port", async () => {
+      // Arrange.
 
-        // Act.
-        const actual = await invokeEndpoint("/stream-error");
+      // Act.
+      const response = await invokeEndpoint("/bad-gateway");
+      const { status } = response;
 
-        // Assert.
-        expect(actual).toMatchObject({ status: 502 });
-      });
+      // Assert.
+      expect(status).toEqual(HttpErrorBadGateway);
+    });
+
+    it("should return a 404 if the api path is shut down (to points to falsy)", async () => {
+      // Arrange.
+
+      // Act.
+      const response = await invokeEndpoint("/shut-it-down");
+      const { status } = response;
+
+      // Assert.
+      expect(status).toEqual(404);
+    });
+  });
+
+  describe("Body", () => {
+    it("should send the body", async () => {
+      // Arrange.
+      const expected = JSON.stringify({ foo: "bar" });
+
+      // Act.
+      const response = await invokeEndpoint("/echo", "POST", expected);
+      const actual = response;
+
+      // Assert.
+      expect(actual.status).toEqual(200);
+      expect(actual.data).toEqual(expected);
+    });
+
+    it("should at least send back the status code of 204 if no body is provided", async () => {
+      // Arrange.
+
+      // Act.
+      const { status: actual } = await invokeEndpoint("/no-body");
+
+      // Assert.
+      expect(actual).toEqual(204);
+    });
+  });
+
+  describe("Error", () => {
+    it("should return a 502 (bad gateway) error if there is a failure when writing back the stream", async () => {
+      // Arrange.
+
+      // Act.
+      const actual = await invokeEndpoint("/stream-error");
+
+      // Assert.
+      expect(actual).toMatchObject({ status: 502 });
     });
   });
 });
