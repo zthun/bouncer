@@ -1,9 +1,10 @@
 {
-  "extends": "./.config/.tsconfig.json",
+  "extends": ["@zthun/janitor-ts-config/base", "@zthun/janitor-ts-config/node"],
   "compilerOptions": {
     "baseUrl": "packages",
-    "target": "esnext",
-    "paths": {}
+    "paths": {
+      "@zthun/bouncer": ["bouncer/src/index.mts"]
+    }
   },
   "include": ["**/*.ts", "**/*.mts"]
 }

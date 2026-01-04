@@ -38,6 +38,7 @@
   "devDependencies": {
     "@types/lodash-es": "^4.17.12",
     "@zthun/janitor-build-config": "^19.5.4",
+    "@zthun/janitor-ts-config": "^19.5.3",
     "tsx": "^4.21.0",
     "typedoc": "^0.28.15",
     "typescript": "~5.9.3",
