@@ -17,10 +17,10 @@ import {
   HttpErrorBadGateway,
   ZBouncerRequestHandlerForward,
 } from "../request/request-handler-forward.mjs";
-import { ZBouncerServerFactoryHttps } from "./node-server-factory-https.mjs";
-import { ZBouncerServer, type IZBouncerServer } from "./server.mjs";
+import { ZBouncerNodeServerFactoryHttps } from "../server/node-server-factory-https.mjs";
+import { ZBouncerServer, type IZBouncerServer } from "../server/server.mjs";
 
-describe("Server", () => {
+describe("Handler", () => {
   const logger = new ZLoggerSilent();
   const domains = {
     localhost: {
@@ -35,6 +35,12 @@ describe("Server", () => {
     },
   };
 
+  const config = new ZBouncerConfigServerBuilder().domains(domains).build();
+  const handler = new ZBouncerRequestHandlerForward(domains, logger);
+  const cert = new ZBouncerCertGeneratorSelfSigned(config.security, logger);
+  const factory = new ZBouncerNodeServerFactoryHttps(config, cert, handler);
+
+  let _proxy: IZBouncerServer;
   let _server8080: Server;
   let _server8081: Server;
   let _serverNoBody: Server;
@@ -42,6 +48,11 @@ describe("Server", () => {
   let _serverError: Server;
 
   beforeAll(async () => {
+    _proxy = new ZBouncerServer(factory, logger);
+
+    await _proxy.start();
+    await _proxy.start();
+
     _server8080 = createServer();
     _server8081 = createServer();
     _serverEcho = createServer();
@@ -62,6 +73,9 @@ describe("Server", () => {
   });
 
   afterAll(async () => {
+    await _proxy.stop();
+    await _proxy.stop();
+
     _server8080.close();
     _server8081.close();
     _serverEcho.close();
@@ -205,43 +219,7 @@ describe("Server", () => {
     );
   }
 
-  describe("Https", () => {
-    const config = new ZBouncerConfigServerBuilder().domains(domains).build();
-    const handler = new ZBouncerRequestHandlerForward(config.domains, logger);
-    const cert = new ZBouncerCertGeneratorSelfSigned(config.security, logger);
-    const factory = new ZBouncerServerFactoryHttps(config, cert, handler);
-
-    let _proxy: IZBouncerServer;
-
-    beforeAll(async () => {
-      _proxy = new ZBouncerServer(factory, logger);
-
-      await _proxy.start();
-      await _proxy.start();
-    });
-
-    afterAll(async () => {
-      await _proxy.stop();
-      await _proxy.stop();
-    });
-
-    it("should mark the server started", async () => {
-      expect(await _proxy.running()).toBeTruthy();
-    });
-
-    it("should fail to create a server if the server is already running", async () => {
-      // Arrange.
-      const target = new ZBouncerServer(factory, logger);
-
-      // Act.
-      await target.start();
-      const actual = await target.running();
-      await target.stop();
-
-      // Assert.
-      expect(actual).toBeFalsy();
-    });
-
+  describe("Forward", () => {
     describe("Missing config entry", () => {
       it("should return a 404 error if no such mapping can be found", async () => {
         // Arrange.
