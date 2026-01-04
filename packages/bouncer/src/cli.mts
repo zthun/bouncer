@@ -1,8 +1,12 @@
 import { ZLoggerConsole } from "@zthun/lumberjacky-log";
 import { ZBouncerCertGeneratorSelfSigned } from "./cert/cert-generator-self-signed.mjs";
 import { ZBouncerConfigSearch } from "./config/config-search.mjs";
-import { ZBouncerConfigServerType } from "./config/config-server.mjs";
+import {
+  ZBouncerConfigServerHandle,
+  ZBouncerConfigServerType,
+} from "./config/config-server.mjs";
 import { ZBouncerRequestHandlerForward } from "./request/request-handler-forward.mjs";
+import { ZBouncerRequestHandlerRedirect } from "./request/request-handler-redirect.mjs";
 import type { IZBouncerRequestHandler } from "./request/request-handler.mjs";
 import { ZBouncerNodeServerFactoryHttp } from "./server/node-server-factory-http.mjs";
 import { ZBouncerNodeServerFactoryHttps } from "./server/node-server-factory-https.mjs";
@@ -17,13 +21,16 @@ import { ZBouncerServer } from "./server/server.mjs";
 
   await Promise.all(
     servers.map((server) => {
-      const { domains, security, type } = server;
+      const { domains, security, type, handle } = server;
 
       let factory: IZBouncerNodeServerFactory;
       let handler: IZBouncerRequestHandler;
 
-      // eslint-disable-next-line prefer-const
-      handler = new ZBouncerRequestHandlerForward(domains, logger);
+      if (handle === ZBouncerConfigServerHandle.Redirect) {
+        handler = new ZBouncerRequestHandlerRedirect(logger);
+      } else {
+        handler = new ZBouncerRequestHandlerForward(domains, logger);
+      }
 
       if (type === ZBouncerConfigServerType.Http) {
         factory = new ZBouncerNodeServerFactoryHttp(server, handler);

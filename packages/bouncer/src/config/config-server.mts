@@ -22,6 +22,26 @@ export enum ZBouncerConfigServerType {
 }
 
 /**
+ * How the server operates.
+ */
+export enum ZBouncerConfigServerHandle {
+  /**
+   * Forward requests.
+   *
+   * This is the default and your typical reverse proxy behavior.
+   */
+  Forward = "forward",
+  /**
+   * Redirect to https.
+   *
+   * This is for when you want to setup both
+   * http and https and you want to redirect all
+   * http traffic to https.
+   */
+  Redirect = "redirect",
+}
+
+/**
  * A domain mapping of domains to paths to internal resource.
  */
 export type ZBouncerDomainMap = Record<
@@ -39,6 +59,14 @@ export interface IZBouncerConfigServer {
    * The default value is {@link ZBouncerConfigServerType.Http}
    */
   type: ZBouncerConfigServerType;
+
+  /**
+   * What this server does.
+   *
+   * The server can act as a reverse proxy or a redirection
+   * to a more secure reverse proxy.
+   */
+  handle?: ZBouncerConfigServerHandle;
 
   /**
    * Port number.
@@ -100,6 +128,21 @@ export class ZBouncerConfigServerBuilder {
    *        This object.
    */
   public https = this.type.bind(this, ZBouncerConfigServerType.Https);
+
+  /**
+   * Sets how the server handles traffic.
+   *
+   * @param type -
+   *        The instruction hint for how the server handles traffic.
+   *
+   * @returns
+   *        This object.
+   */
+  public handle(type: ZBouncerConfigServerHandle | undefined) {
+    this._config.handle = type;
+
+    return this;
+  }
 
   /**
    * Sets or removes the port.
@@ -185,6 +228,7 @@ export class ZBouncerConfigServerBuilder {
   public assign(other: ZDeepPartial<IZBouncerConfigServer>) {
     return this.type(firstDefined(this._config.type, other.type))
       .port(firstDefined(this._config.port, other.port))
+      .handle(firstDefined(this._config.handle, other.handle))
       .security(other.security)
       .domains(other.domains as ZBouncerDomainMap);
   }

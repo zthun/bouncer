@@ -1,6 +1,10 @@
 export default {
   servers: [
     {
+      type: "http",
+      handle: "redirect",
+    },
+    {
       type: "https",
       security: {
         domain: "local.zthunworks.com",
