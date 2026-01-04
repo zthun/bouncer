@@ -1,10 +1,11 @@
 import { createError, firstDefined, firstTruthy } from "@zthun/helpful-fn";
+import type { RequestInit as URequestInit } from "undici-types";
+
 import {
   ZLogEntryBuilder,
   ZLoggerContext,
   type IZLogger,
 } from "@zthun/lumberjacky-log";
-import fetch from "cross-fetch";
 import { castArray, get } from "lodash-es";
 import type {
   IncomingHttpHeaders,
@@ -22,7 +23,6 @@ export const HttpErrorBadGateway = 502;
 
 // Partial codes to overrides.  Anything not found in this map, should
 // result in DefaultErrorCode
-
 const CodeToHttpError: Record<string, number> = {
   // Aborted - 499 isn't standard, but it's the most widely accepted
   // one we have for this case - see docs for NGINX
@@ -40,6 +40,11 @@ const CodeToHttpError: Record<string, number> = {
   ENOMEM: 503,
   EAGAIN: 503,
 };
+
+// Most HttpVerbs allow a body, but these do not allow it,
+// so we have to check to make sure that we don't forward
+// any ghost bodies with them.
+const NoBodyVerbs = ["GET", "HEAD"];
 
 /**
  * A request handler that forwards request to different domain endpoints.
@@ -131,10 +136,16 @@ export class ZBouncerRequestHandlerForward implements IZBouncerRequestHandler {
     msg = `Forwarding to ${url}`;
     this._logger.log(new ZLogEntryBuilder().info().message(msg).build());
 
-    const init: RequestInit = {
+    const init: RequestInit & URequestInit = {
       method,
       headers: this._castHeaders(req.headers),
+      redirect: "manual",
     };
+
+    if (!NoBodyVerbs.includes(method)) {
+      init.duplex = "half";
+      init.body = req as any;
+    }
 
     fetch(url, init)
       .then(async (response) => {

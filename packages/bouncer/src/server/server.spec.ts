@@ -29,32 +29,26 @@ describe("Server", () => {
       "/eighty-eighty-one": "http://localhost:8081",
       "/bad-gateway": "http://localhost:8082",
       "/shut-it-down": null,
+      "/echo": "http://localhost:9001",
     },
   };
 
   let _server8080: Server;
   let _server8081: Server;
+  let _serverEcho: Server;
 
   beforeAll(async () => {
     _server8080 = createServer();
     _server8081 = createServer();
-
-    const writeBackPort = (
-      port: number,
-      req: IncomingMessage,
-      res: ServerResponse,
-    ) => {
-      const { url } = req;
-      res
-        .writeHead(200, { "content-type": ZMimeTypeText.Plain })
-        .end(`${url}--${port}`);
-    };
+    _serverEcho = createServer();
 
     _server8080.on("request", writeBackPort.bind(null, 8080));
     _server8081.on("request", writeBackPort.bind(null, 8081));
+    _serverEcho.on("request", echoBody);
 
     _server8080.listen(8080);
     _server8081.listen(8081);
+    _serverEcho.listen(9001);
   });
 
   afterAll(async () => {
@@ -62,17 +56,53 @@ describe("Server", () => {
     _server8081.close();
   });
 
-  function invokeUrl(url: string) {
+  function writeBackPort(
+    port: number,
+    req: IncomingMessage,
+    res: ServerResponse,
+  ) {
+    const { url } = req;
+    res
+      .writeHead(200, { "content-type": ZMimeTypeText.Plain })
+      .end(`${url}--${port}`);
+  }
+
+  function echoBody(req: IncomingMessage, res: ServerResponse) {
+    let body = "";
+
+    req.setEncoding("utf8");
+
+    req.on("data", (chunk) => {
+      body += chunk;
+    });
+
+    req.on("end", () => {
+      res.writeHead(200, { "content-type": "application/json" }).end(body);
+    });
+
+    req.on("error", () => {
+      res.writeHead(500).end();
+    });
+  }
+
+  function invokeUrl(url: string, method: string = "GET", body?: string) {
     return new Promise<{
       status: number;
       data: string;
       headers: IncomingHttpHeaders;
     }>((res, rej) => {
       const options: RequestOptions = {
+        method,
         agent: new Agent({
           rejectUnauthorized: false,
         }),
         rejectUnauthorized: false,
+        headers: body
+          ? {
+              "content-type": "application/json",
+              "content-length": Buffer.byteLength(body),
+            }
+          : undefined,
       };
 
       const client = request(url, options, (msg) => {
@@ -92,6 +122,10 @@ describe("Server", () => {
         });
       });
 
+      if (body) {
+        client.write(body);
+      }
+
       client.on("error", (err) => {
         rej({
           status: 500,
@@ -104,13 +138,19 @@ describe("Server", () => {
     });
   }
 
-  function invokeEndpoint(which: keyof typeof domains.localhost) {
+  function invokeEndpoint(
+    which: keyof typeof domains.localhost,
+    method?: string,
+    body?: string,
+  ) {
     return invokeUrl(
       new ZUrlBuilder()
         .protocol("https")
         .hostname("localhost")
         .path(which)
         .build(),
+      method,
+      body,
     );
   }
 
@@ -279,6 +319,21 @@ describe("Server", () => {
 
         // Assert.
         expect(status).toEqual(404);
+      });
+    });
+
+    describe("Body", () => {
+      it("should send the body", async () => {
+        // Arrange.
+        const expected = JSON.stringify({ foo: "bar" });
+
+        // Act.
+        const response = await invokeEndpoint("/echo", "POST", expected);
+        const actual = response;
+
+        // Assert.
+        expect(actual.status).toEqual(200);
+        expect(actual.data).toEqual(expected);
       });
     });
   });
