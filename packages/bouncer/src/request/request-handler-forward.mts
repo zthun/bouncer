@@ -127,10 +127,6 @@ export class ZBouncerRequestHandlerForward implements IZBouncerRequestHandler {
       return;
     }
 
-    bodyStream.on("error", () => {
-      res.destroy();
-    });
-
     res.on("close", () => {
       bodyStream.destroy();
     });

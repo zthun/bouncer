@@ -31,6 +31,7 @@ describe("Server", () => {
       "/shut-it-down": null,
       "/echo": "http://localhost:9001",
       "/no-body": "http://localhost:9002",
+      "/stream-error": "http://localhost:9003",
     },
   };
 
@@ -38,22 +39,26 @@ describe("Server", () => {
   let _server8081: Server;
   let _serverNoBody: Server;
   let _serverEcho: Server;
+  let _serverError: Server;
 
   beforeAll(async () => {
     _server8080 = createServer();
     _server8081 = createServer();
     _serverEcho = createServer();
     _serverNoBody = createServer();
+    _serverError = createServer();
 
     _server8080.on("request", writeBackPort.bind(null, 8080));
     _server8081.on("request", writeBackPort.bind(null, 8081));
     _serverEcho.on("request", echoBody);
     _serverNoBody.on("request", returnNoBody);
+    _serverError.on("request", writeChunkThenError);
 
     _server8080.listen(8080);
     _server8081.listen(8081);
     _serverEcho.listen(9001);
     _serverNoBody.listen(9002);
+    _serverError.listen(9003);
   });
 
   afterAll(async () => {
@@ -61,6 +66,7 @@ describe("Server", () => {
     _server8081.close();
     _serverEcho.close();
     _serverNoBody.close();
+    _serverError.close();
   });
 
   function writeBackPort(
@@ -96,6 +102,12 @@ describe("Server", () => {
     res.writeHead(204).end();
   }
 
+  function writeChunkThenError(_: IncomingMessage, res: ServerResponse) {
+    res.writeHead(200, { "content-type": ZMimeTypeText.Plain });
+    res.write("partial");
+    res.destroy(new Error("stream error"));
+  }
+
   function invokeUrl(url: string, method: string = "GET", body?: string) {
     return new Promise<{
       status: number;
@@ -118,18 +130,46 @@ describe("Server", () => {
 
       const client = request(url, options, (msg) => {
         let chunks = "";
+        let ended = false;
 
         msg.on("data", (chunk) => {
           chunks += chunk;
         });
 
+        msg.on("aborted", () => {
+          rej({
+            status: 500,
+            data: "aborted",
+            headers: msg.headers,
+          });
+        });
+
+        msg.on("error", (err) => {
+          rej({
+            status: 500,
+            data: err.message,
+            headers: msg.headers,
+          });
+        });
+
         msg.on("end", () => {
+          ended = true;
           const result = {
             status: firstDefined(200, msg.statusCode),
             data: chunks,
             headers: msg.headers,
           };
           res(result);
+        });
+
+        msg.on("close", () => {
+          if (!ended) {
+            rej({
+              status: 500,
+              data: "closed",
+              headers: msg.headers,
+            });
+          }
         });
       });
 
@@ -355,6 +395,18 @@ describe("Server", () => {
 
         // Assert.
         expect(actual).toEqual(204);
+      });
+    });
+
+    describe("Error", () => {
+      it("should return a 502 (bad gateway) error if there is a failure when writing back the stream", async () => {
+        // Arrange.
+
+        // Act.
+        const actual = await invokeEndpoint("/stream-error");
+
+        // Assert.
+        expect(actual).toMatchObject({ status: 502 });
       });
     });
   });
