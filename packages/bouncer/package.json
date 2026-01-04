@@ -33,7 +33,6 @@
     "@zthun/lumberjacky-log": "^4.0.2",
     "@zthun/webigail-url": "^5.0.2",
     "cosmiconfig": "^9.0.0",
-    "cross-fetch": "^4.1.0",
     "lodash-es": "^4.17.21"
   },
   "devDependencies": {
