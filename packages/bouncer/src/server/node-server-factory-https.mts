@@ -11,7 +11,7 @@ import type {
 /**
  * Represents a server factory for http services.
  */
-export class ZBouncerServerFactoryHttps implements IZBouncerNodeServerFactory {
+export class ZBouncerNodeServerFactoryHttps implements IZBouncerNodeServerFactory {
   public name = "Https";
 
   /**
@@ -35,16 +35,14 @@ export class ZBouncerServerFactoryHttps implements IZBouncerNodeServerFactory {
     const certificate = await this._generator.generate();
 
     return new Promise((resolve, reject) => {
-      const handle = this._handler.handle.bind(this._handler);
-      const https = createServer(certificate, handle);
       const port = firstDefined(443, this._config.port);
-
-      https.once("error", reject);
-
-      https.listen(port, () => {
-        https.removeListener("error", reject);
-        resolve(https);
-      });
+      const handle = this._handler.handle.bind(this._handler);
+      const https = createServer(certificate, handle)
+        .once("error", reject)
+        .listen(port, () => {
+          https.removeListener("error", reject);
+          resolve(https);
+        });
     });
   }
 }
