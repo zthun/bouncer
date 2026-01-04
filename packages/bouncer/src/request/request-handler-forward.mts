@@ -12,6 +12,7 @@ import type {
   IncomingMessage,
   ServerResponse,
 } from "node:http";
+import { Readable } from "node:stream";
 import type { ZBouncerDomainMap } from "../config/config-server.mjs";
 import type { IZBouncerRequestHandler } from "./request-handler.mjs";
 
@@ -116,6 +117,38 @@ export class ZBouncerRequestHandlerForward implements IZBouncerRequestHandler {
     return forward;
   }
 
+  private _streamResponse(response: Response, res: ServerResponse) {
+    const bodyStream = response.body
+      ? Readable.fromWeb(response.body as any)
+      : null;
+
+    if (!bodyStream) {
+      res.end();
+      return;
+    }
+
+    bodyStream.on("error", () => {
+      res.destroy();
+    });
+
+    res.on("close", () => {
+      bodyStream.destroy();
+    });
+
+    bodyStream.pipe(res);
+  }
+
+  private _streamError(reason: any, res: ServerResponse) {
+    const code = get(reason, "code", "UNKNOWN");
+    const status = firstDefined(HttpErrorBadGateway, CodeToHttpError[code]);
+
+    const error = createError(reason);
+    const msg = error.message;
+    this._logger.log(new ZLogEntryBuilder().error().message(msg).build());
+
+    res.writeHead(status).end();
+  }
+
   public handle(req: IncomingMessage, res: ServerResponse) {
     const method = firstDefined("GET", req.method).toUpperCase();
     const path = firstTruthy("/", req.url);
@@ -149,20 +182,12 @@ export class ZBouncerRequestHandlerForward implements IZBouncerRequestHandler {
 
     fetch(url, init)
       .then(async (response) => {
-        const body = await response.arrayBuffer();
-
         response.headers.forEach((value, key) => res.setHeader(key, value));
-        res.writeHead(response.status).end(Buffer.from(body));
+        res.writeHead(response.status);
+        this._streamResponse(response, res);
       })
       .catch((reason) => {
-        const code = get(reason, "code", "UNKNOWN");
-        const status = firstDefined(HttpErrorBadGateway, CodeToHttpError[code]);
-
-        const error = createError(reason);
-        msg = error.message;
-        this._logger.log(new ZLogEntryBuilder().error().message(msg).build());
-
-        res.writeHead(status).end();
+        this._streamError(reason, res);
       });
   }
 }
