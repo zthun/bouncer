@@ -112,10 +112,11 @@ export class ZBouncerRequestHandlerForward implements IZBouncerRequestHandler {
   }
 
   public handle(req: IncomingMessage, res: ServerResponse) {
+    const method = firstDefined("GET", req.method).toUpperCase();
     const path = firstTruthy("/", req.url);
     const host = req.headers.host;
 
-    let msg = `Received a request for ${host} - ${path}`;
+    let msg = `Received a request for ${method} - ${host} - ${path}`;
     this._logger.log(new ZLogEntryBuilder().info().message(msg).build());
     const url = this._findRoute(firstDefined("", host), path);
 
@@ -127,10 +128,8 @@ export class ZBouncerRequestHandlerForward implements IZBouncerRequestHandler {
       return;
     }
 
-    msg = `Forwarding to ${url}.`;
+    msg = `Forwarding to ${url}`;
     this._logger.log(new ZLogEntryBuilder().info().message(msg).build());
-
-    const method = firstDefined("GET", req.method).toUpperCase();
 
     const init: RequestInit = {
       method,
