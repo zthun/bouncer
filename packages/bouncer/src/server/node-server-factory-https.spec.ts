@@ -32,6 +32,17 @@ describe("Https", () => {
     expect(await _proxy.running()).toBeTruthy();
   });
 
+  it("should stop the server", async () => {
+    // Arrange.
+    await _proxy.stop();
+
+    // Act.
+    const actual = await _proxy.running();
+
+    // Assert.
+    expect(actual).toBeFalsy();
+  });
+
   it("should fail to create a server if the server is already running", async () => {
     // Arrange.
     const target = new ZBouncerServer(factory, logger);

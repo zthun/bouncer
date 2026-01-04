@@ -60,7 +60,10 @@ export class ZBouncerServer implements IZBouncerServer {
         return;
       }
 
-      this._server.close(() => resolve());
+      this._server.close(() => {
+        this._server = null;
+        resolve();
+      });
     });
   }
 }
