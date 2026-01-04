@@ -2,7 +2,7 @@ import { ZLoggerConsole } from "@zthun/lumberjacky-log";
 import { ZBouncerCertGeneratorSelfSigned } from "./cert/cert-generator-self-signed.mjs";
 import { ZBouncerConfigSearch } from "./config/config-search.mjs";
 import { ZBouncerRequestHandlerForward } from "./request/request-handler-forward.mjs";
-import { ZBouncerServerFactoryHttps } from "./server/node-server-factory-https.mjs";
+import { ZBouncerNodeServerFactoryHttps } from "./server/node-server-factory-https.mjs";
 import { ZBouncerServer } from "./server/server.mjs";
 
 (async function main() {
@@ -16,12 +16,8 @@ import { ZBouncerServer } from "./server/server.mjs";
       const { domains, security } = server;
 
       const handler = new ZBouncerRequestHandlerForward(domains, logger);
-      const generator = new ZBouncerCertGeneratorSelfSigned(security, logger);
-      const factory = new ZBouncerServerFactoryHttps(
-        server,
-        generator,
-        handler,
-      );
+      const cert = new ZBouncerCertGeneratorSelfSigned(security, logger);
+      const factory = new ZBouncerNodeServerFactoryHttps(server, cert, handler);
 
       return new ZBouncerServer(factory, logger).start();
     }),
