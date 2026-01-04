@@ -30,30 +30,37 @@ describe("Server", () => {
       "/bad-gateway": "http://localhost:8082",
       "/shut-it-down": null,
       "/echo": "http://localhost:9001",
+      "/no-body": "http://localhost:9002",
     },
   };
 
   let _server8080: Server;
   let _server8081: Server;
+  let _serverNoBody: Server;
   let _serverEcho: Server;
 
   beforeAll(async () => {
     _server8080 = createServer();
     _server8081 = createServer();
     _serverEcho = createServer();
+    _serverNoBody = createServer();
 
     _server8080.on("request", writeBackPort.bind(null, 8080));
     _server8081.on("request", writeBackPort.bind(null, 8081));
     _serverEcho.on("request", echoBody);
+    _serverNoBody.on("request", returnNoBody);
 
     _server8080.listen(8080);
     _server8081.listen(8081);
     _serverEcho.listen(9001);
+    _serverNoBody.listen(9002);
   });
 
   afterAll(async () => {
     _server8080.close();
     _server8081.close();
+    _serverEcho.close();
+    _serverNoBody.close();
   });
 
   function writeBackPort(
@@ -83,6 +90,10 @@ describe("Server", () => {
     req.on("error", () => {
       res.writeHead(500).end();
     });
+  }
+
+  function returnNoBody(_: IncomingMessage, res: ServerResponse) {
+    res.writeHead(204).end();
   }
 
   function invokeUrl(url: string, method: string = "GET", body?: string) {
@@ -334,6 +345,16 @@ describe("Server", () => {
         // Assert.
         expect(actual.status).toEqual(200);
         expect(actual.data).toEqual(expected);
+      });
+
+      it("should at least send back the status code of 204 if no body is provided", async () => {
+        // Arrange.
+
+        // Act.
+        const { status: actual } = await invokeEndpoint("/no-body");
+
+        // Assert.
+        expect(actual).toEqual(204);
       });
     });
   });
