@@ -11,15 +11,19 @@ import { ZBouncerServer } from "./server/server.mjs";
   const config = await explorer.search();
   const { servers } = config;
 
-  const [server] = servers;
-
-  const { domains, security } = server;
-
-  const handler = new ZBouncerRequestHandlerForward(domains, logger);
-  const generator = new ZBouncerCertGeneratorSelfSigned(security, logger);
-  const factory = new ZBouncerServerFactoryHttps(server, generator, handler);
-
   await Promise.all(
-    [new ZBouncerServer(factory, logger)].map((s) => s.start()),
+    servers.map((server) => {
+      const { domains, security } = server;
+
+      const handler = new ZBouncerRequestHandlerForward(domains, logger);
+      const generator = new ZBouncerCertGeneratorSelfSigned(security, logger);
+      const factory = new ZBouncerServerFactoryHttps(
+        server,
+        generator,
+        handler,
+      );
+
+      return new ZBouncerServer(factory, logger).start();
+    }),
   );
 })();
