@@ -1,39 +1,103 @@
-import { merge } from "lodash-es";
-import type { IZBouncerDomain } from "./config-domain.mjs";
-import type { IZBouncerSecurity } from "./config-security.mjs";
-import { ZBouncerSecurityBuilder } from "./config-security.mjs";
+import { firstDefined, type ZDeepPartial } from "@zthun/helpful-fn";
+import { castArray } from "lodash-es";
+import {
+  ZBouncerConfigServerBuilder,
+  type IZBouncerConfigServer,
+} from "./config-server.mjs";
 
+/**
+ * Represents the configuration for the bounder service.
+ */
 export interface IZBouncerConfig {
-  security: IZBouncerSecurity;
-  domains: IZBouncerDomain[];
+  /**
+   * The collection of servers to run.
+   *
+   * Servers are built by type.  If you have two servers with an identical
+   * protocol, then those configs are merged in a last one wins priority.
+   */
+  servers: IZBouncerConfigServer[];
 }
 
+/**
+ * A builder for a bouncer config object.
+ */
 export class ZBouncerConfigBuilder {
-  private _config: IZBouncerConfig;
+  private _http: IZBouncerConfigServer | undefined = undefined;
+  private _https: IZBouncerConfigServer | undefined = undefined;
 
-  public constructor() {
-    this._config = {
-      domains: [],
-      security: new ZBouncerSecurityBuilder().build(),
-    };
+  private _assignServer(
+    fallback: IZBouncerConfigServer,
+    current: IZBouncerConfigServer | undefined,
+    next: IZBouncerConfigServer,
+  ) {
+    return new ZBouncerConfigServerBuilder()
+      .copy(firstDefined(fallback, current))
+      .assign(next)
+      .build();
   }
 
-  public domains(domains: IZBouncerDomain[]) {
-    this._config.domains = domains;
+  private http(server: IZBouncerConfigServer) {
+    this._http = this._assignServer(
+      new ZBouncerConfigServerBuilder().http().build(),
+      this._http,
+      server,
+    );
+  }
+
+  private https(server: IZBouncerConfigServer) {
+    this._https = this._assignServer(
+      new ZBouncerConfigServerBuilder().https().build(),
+      this._https,
+      server,
+    );
+  }
+
+  /**
+   * Merges the server configs into the existing config.
+   *
+   * @param server -
+   *        A list of servers or a single server to merge
+   *        into the config.
+   */
+  public server(server: IZBouncerConfigServer | IZBouncerConfigServer[]) {
+    // Servers are merged via their types.
+    const assignments = castArray(server);
+
+    assignments.forEach((server) => {
+      this[server.type](server);
+    });
 
     return this;
   }
 
-  public domain(domain: IZBouncerDomain) {
-    return this.domains(this._config.domains.concat(domain));
+  /**
+   * Assigns the configuration values from a deeply optional config.
+   *
+   * @param config -
+   *        The contents of the bouncer config file.
+   *
+   * @returns
+   *        This object.
+   */
+  public assign(config: ZDeepPartial<IZBouncerConfig>) {
+    const { servers = [] } = config;
+
+    const definitions = servers
+      .filter((s) => !!s)
+      .map((s) => new ZBouncerConfigServerBuilder().assign(s).build());
+
+    return this.server(definitions);
   }
 
-  public assign(config: Partial<IZBouncerConfig>) {
-    this._config = merge(this._config, config);
-    return this;
-  }
+  /**
+   * Gets the built configuration.
+   *
+   * @return
+   *        A deep copy of the built configuration.
+   */
+  public build(): IZBouncerConfig {
+    const servers = [this._http, this._https].filter((s) => !!s);
 
-  public build() {
-    return structuredClone(this._config);
+    return structuredClone({ servers });
   }
 }

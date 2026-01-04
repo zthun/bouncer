@@ -13,7 +13,7 @@ describe("ZBouncerConfigSearch", () => {
     const actual = await target.search();
 
     // Assert.
-    expect(actual.domains.length).toBeGreaterThan(0);
+    expect(actual.servers.length).toBeGreaterThan(0);
   });
 
   it("should return the default configuration if no config can be found", async () => {

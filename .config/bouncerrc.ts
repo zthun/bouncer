@@ -1,15 +1,21 @@
 export default {
-  domains: [
+  servers: [
     {
-      host: `database.local.zthunworks.com`,
-      paths: {
-        "/": "bouncer-mongo-admin:8081",
-      },
+      type: "http",
+      handle: "redirect",
     },
     {
-      host: `email.local.zthunworks.com`,
-      paths: {
-        "/": "bouncer-email",
+      type: "https",
+      security: {
+        domain: "local.zthunworks.com",
+      },
+      domains: {
+        "database.local.zthunworks.com": {
+          "/": "http://bouncer-mongo-admin:8081",
+        },
+        "email.local.zthunworks.com": {
+          "/": "http://bouncer-email",
+        },
       },
     },
   ],

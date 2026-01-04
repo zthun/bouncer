@@ -1,18 +1,13 @@
-import type { IZLogger } from "@zthun/lumberjacky-log";
-import { ZLogEntryBuilder, ZLoggerContext } from "@zthun/lumberjacky-log";
-import type {
-  HttpReverseProxyOptions,
-  HttpsServerOptions,
-  LetsEncryptSelfSignedOptions,
-  RouteRegistrationOptions,
-} from "http-reverse-proxy-ts";
+import { createError } from "@zthun/helpful-fn";
 import {
-  HttpReverseProxy,
-  LetsEncryptUsingSelfSigned,
-} from "http-reverse-proxy-ts";
-import { join } from "node:path";
-import { cwd } from "node:process";
-import type { IZBouncerConfig } from "../config/config.mjs";
+  ZLogEntryBuilder,
+  ZLoggerContext,
+  type IZLogger,
+} from "@zthun/lumberjacky-log";
+import type {
+  IZBouncerNodeServerFactory,
+  NodeServerLike,
+} from "./node-server-factory.mjs";
 
 export interface IZBouncerServer {
   running(): Promise<boolean>;
@@ -22,70 +17,53 @@ export interface IZBouncerServer {
 
 export class ZBouncerServer implements IZBouncerServer {
   private _log: IZLogger;
-  private _proxy: HttpReverseProxy | null = null;
+  private _server: NodeServerLike | null = null;
 
   public constructor(
-    public config: IZBouncerConfig,
+    private readonly _factory: IZBouncerNodeServerFactory,
     log: IZLogger,
   ) {
     this._log = new ZLoggerContext("ZBouncerServer", log);
   }
 
   public async running(): Promise<boolean> {
-    return this._proxy != null;
+    return this._server != null;
   }
 
   public async start(): Promise<void> {
-    let msg = `Current working directory: ${cwd()}`;
+    if (await this.running()) {
+      return;
+    }
+
+    const { name } = this._factory;
+
+    let msg = `Starting proxy server: ${name}`;
     this._log.log(new ZLogEntryBuilder().info().message(msg).build());
 
-    const letsEncryptOptions: LetsEncryptSelfSignedOptions = {
-      country: this.config.security.country,
-      locality: this.config.security.city,
-      organizationName: this.config.security.organization,
-      state: this.config.security.state,
-    };
+    try {
+      this._server = await this._factory.create();
 
-    const httpsOptions: HttpsServerOptions = {
-      certificates: {
-        certificateStoreRoot: "./.certificates",
-      },
-    };
-
-    const options: HttpReverseProxyOptions = {
-      letsEncryptOptions,
-      httpsOptions,
-    };
-
-    const registrationOptions: RouteRegistrationOptions = {
-      https: {
-        redirectToHttps: true,
-        letsEncrypt: {
-          email: this.config.security.email,
-          production: false,
-        },
-      },
-    };
-
-    this._proxy = new HttpReverseProxy(options, LetsEncryptUsingSelfSigned);
-
-    this.config.domains.forEach((d) => {
-      Object.keys(d.paths).forEach((p) => {
-        const endpoint = join(d.host, p);
-        const forward = d.paths[p];
-        msg = `Adding route, ${endpoint}, to ${forward}`;
-        this._log.log(new ZLogEntryBuilder().info().message(msg).build());
-        this._proxy!.addRoute(endpoint, forward, registrationOptions);
-      });
-    });
-
-    msg = "Proxy server started";
-    this._log.log(new ZLogEntryBuilder().info().message(msg).build());
+      msg = `Proxy server started: ${name}`;
+      this._log.log(new ZLogEntryBuilder().info().message(msg).build());
+    } catch (e) {
+      const error = createError(e);
+      const { message } = error;
+      msg = `Failed to start proxy server: ${message}`;
+      this._log.log(new ZLogEntryBuilder().error().message(msg).build());
+    }
   }
 
-  stop(): Promise<void> {
-    this._proxy?.close();
-    this._proxy = null;
-    return Promise.resolve();
+  public async stop(): Promise<void> {
+    return new Promise<void>((resolve) => {
+      if (this._server == null) {
+        resolve();
+        return;
+      }
+
+      this._server.close(() => {
+        this._server = null;
+        resolve();
+      });
+    });
   }
 }

@@ -1,21 +1,21 @@
-export interface IZBouncerSecurity {
+export interface IZBouncerConfigSecurity {
   organization: string;
   country: string;
   state: string;
   city: string;
-  email: string;
+  domain: string;
 }
 
-export class ZBouncerSecurityBuilder {
-  private _security: IZBouncerSecurity;
+export class ZBouncerConfigSecurityBuilder {
+  private _security: IZBouncerConfigSecurity;
 
   public constructor() {
     this._security = {
       organization: "Developer Proxy Org",
-      country: "United States",
+      country: "US",
       state: "California",
       city: "Irvine",
-      email: "admin@dev-proxy.org",
+      domain: "localhost",
     };
   }
 
@@ -25,8 +25,20 @@ export class ZBouncerSecurityBuilder {
     return this;
   }
 
-  public email(val: string) {
-    this._security.email = val;
+  public country(val: string) {
+    this._security.country = val;
+
+    return this;
+  }
+
+  public copy(other: IZBouncerConfigSecurity) {
+    this._security = structuredClone(other);
+
+    return this;
+  }
+
+  public assign(other: Partial<IZBouncerConfigSecurity>) {
+    this._security = { ...this._security, ...other };
 
     return this;
   }
