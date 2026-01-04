@@ -1,4 +1,4 @@
-import { createError, firstDefined } from "@zthun/helpful-fn";
+import { createError, firstDefined, firstTruthy } from "@zthun/helpful-fn";
 import {
   ZLogEntryBuilder,
   ZLoggerContext,
@@ -67,9 +67,35 @@ export class ZBouncerRequestHandlerForward implements IZBouncerRequestHandler {
       return null;
     }
 
-    const mapping = target[pathname];
+    const normalized = pathname.split("/").filter(Boolean).join("/");
+    const path = `/${normalized}`;
 
-    return firstDefined(null, mapping);
+    for (let cursor = path; ; ) {
+      const mapped = target[cursor];
+
+      if (mapped === null) {
+        // This is a special case.  If the actual value is set to null,
+        // then we are done since this path is essentially black listed
+        // explicitly
+        return null;
+      }
+
+      if (mapped != null) {
+        const base = mapped.replace(/\/$/, "");
+        return `${base}${path}`;
+      }
+
+      if (cursor === "/") {
+        // We're at the root; We have to check this at least once,
+        // so we can break at this point.
+        break;
+      }
+
+      const lastSlash = cursor.lastIndexOf("/");
+      cursor = firstTruthy("/", cursor.substring(0, lastSlash));
+    }
+
+    return null;
   }
 
   private _castHeaders(headers: IncomingHttpHeaders) {
@@ -86,7 +112,7 @@ export class ZBouncerRequestHandlerForward implements IZBouncerRequestHandler {
   }
 
   public handle(req: IncomingMessage, res: ServerResponse) {
-    const path = firstDefined("/", req.url);
+    const path = firstTruthy("/", req.url);
     const host = req.headers.host;
 
     let msg = `Received a request for ${host} - ${path}`;

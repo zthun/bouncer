@@ -25,6 +25,7 @@ describe("Server", () => {
   const domains = {
     localhost: {
       "/eighty-eighty": "http://localhost:8080",
+      "/eighty-eighty/api": "http://localhost:8081",
       "/eighty-eighty-one": "http://localhost:8081",
       "/bad-gateway": "http://localhost:8082",
       "/shut-it-down": null,
@@ -40,12 +41,13 @@ describe("Server", () => {
 
     const writeBackPort = (
       port: number,
-      _: IncomingMessage,
+      req: IncomingMessage,
       res: ServerResponse,
     ) => {
+      const { url } = req;
       res
         .writeHead(200, { "content-type": ZMimeTypeText.Plain })
-        .end(String(port));
+        .end(`${url}--${port}`);
     };
 
     _server8080.on("request", writeBackPort.bind(null, 8080));
@@ -183,7 +185,7 @@ describe("Server", () => {
     describe("Found config entry", () => {
       it("should forward the request", async () => {
         // Arrange.
-        const expected = "8080";
+        const expected = "/eighty-eighty--8080";
 
         // Act.
         const response = await invokeEndpoint("/eighty-eighty");
@@ -195,10 +197,62 @@ describe("Server", () => {
 
       it("should forward the request to the correct path", async () => {
         // Arrange.
-        const expected = "8081";
+        const expected = "/eighty-eighty-one--8081";
 
         // Act.
         const response = await invokeEndpoint("/eighty-eighty-one");
+        const { data: actual } = response;
+
+        // Assert.
+        expect(actual).toEqual(expected);
+      });
+
+      it("should include the entire path once matched", async () => {
+        // Arrange.
+        const path = `/eighty-eighty/some/more/routing`;
+        const expected = `${path}--8080`;
+
+        // Act.
+        const response = await invokeUrl(
+          new ZUrlBuilder()
+            .protocol("https")
+            .hostname("localhost")
+            .path(path)
+            .build(),
+        );
+        const { data: actual } = response;
+
+        // Assert.
+        expect(actual).toEqual(expected);
+      });
+
+      it("should only match path segments, not partial paths", async () => {
+        // Arrange.
+        const path = `/eighty-eighty/api-x`;
+        // Note: the / path is matched on 8080, so the 8080 path should be hit.
+        const expected = "/eighty-eighty/api-x--8080";
+
+        // Act.
+        const response = await invokeUrl(
+          new ZUrlBuilder()
+            .protocol("https")
+            .hostname("localhost")
+            .path(path)
+            .build(),
+        );
+        const { data: actual } = response;
+
+        // Assert.
+        expect(actual).toEqual(expected);
+      });
+
+      it("should normalize the paths", async () => {
+        // Arrange.
+        const url = "https://localhost//////eighty-eighty-one/////";
+        const expected = "/eighty-eighty-one--8081";
+
+        // Act.
+        const response = await invokeUrl(url);
         const { data: actual } = response;
 
         // Assert.
