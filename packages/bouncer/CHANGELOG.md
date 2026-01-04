@@ -3,6 +3,34 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.0.0](https://github.com/zthun/bouncer/compare/v3.0.0...v4.0.0) (2026-01-04)
+
+
+### ⚠ BREAKING CHANGES
+
+* configuration domain is now a map over an array
+
+### Features
+
+* bouncer can now run a http server that redirects to https ([b9d15ed](https://github.com/zthun/bouncer/commit/b9d15ed66d4385b87306feaf23179fc1c826758c))
+* bouncer can now run http servers if need be ([b9bfdf4](https://github.com/zthun/bouncer/commit/b9bfdf449c58b01824862296e0cf7ef22396ce43))
+* bouncer can now start multiple servers on different ports instead of just 1 ([d11bb3a](https://github.com/zthun/bouncer/commit/d11bb3ad48cc76248fc4b1ebb5877cfcd8c5bf95))
+* cert generate self signed generates a self signed certificate ([6f53fbb](https://github.com/zthun/bouncer/commit/6f53fbb4e5b919c0975750f20330d5489a69e58e))
+* cert-generator generates a self signed cert ([fb78b9d](https://github.com/zthun/bouncer/commit/fb78b9d67b932dcfe2c2be61cf9c445c916b1115))
+* you can now run an http server (unsecure) with bouncer ([d12c34d](https://github.com/zthun/bouncer/commit/d12c34d7a9e50748cfee099262e8485a76aa8b53))
+
+
+### Bug Fixes
+
+* country should be 2 characters ([f0ad575](https://github.com/zthun/bouncer/commit/f0ad57536b929448492a84ea26d0c565f172277f))
+
+
+### Code Refactoring
+
+* configuration domain is now a map over an array ([972aa5a](https://github.com/zthun/bouncer/commit/972aa5a8159fe57baacf08964dc14f50deba0b85))
+
+
+
 ## [3.0.0](https://github.com/zthun/bouncer/compare/v2.0.7...v3.0.0) (2025-10-23)
 
 
