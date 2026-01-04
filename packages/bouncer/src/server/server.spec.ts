@@ -209,7 +209,7 @@ describe("Server", () => {
     const config = new ZBouncerConfigServerBuilder().domains(domains).build();
     const handler = new ZBouncerRequestHandlerForward(config.domains, logger);
     const cert = new ZBouncerCertGeneratorSelfSigned(config.security, logger);
-    const factory = new ZBouncerServerFactoryHttps(cert, handler);
+    const factory = new ZBouncerServerFactoryHttps(config, cert, handler);
 
     let _proxy: IZBouncerServer;
 

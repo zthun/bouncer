@@ -1,5 +1,7 @@
+import { firstDefined } from "@zthun/helpful-fn";
 import { createServer } from "node:https";
 import type { IZBouncerCertGenerator } from "../cert/cert-generator.mjs";
+import type { IZBouncerConfigServer } from "../config/config-server.mjs";
 import type { IZBouncerRequestHandler } from "../request/request-handler.mjs";
 import type {
   IZBouncerNodeServerFactory,
@@ -24,6 +26,7 @@ export class ZBouncerServerFactoryHttps implements IZBouncerNodeServerFactory {
    *        The handler for incoming requests.
    */
   public constructor(
+    private readonly _config: IZBouncerConfigServer,
     private readonly _generator: IZBouncerCertGenerator,
     private readonly _handler: IZBouncerRequestHandler,
   ) {}
@@ -34,10 +37,11 @@ export class ZBouncerServerFactoryHttps implements IZBouncerNodeServerFactory {
     return new Promise((resolve, reject) => {
       const handle = this._handler.handle.bind(this._handler);
       const https = createServer(certificate, handle);
+      const port = firstDefined(443, this._config.port);
 
       https.once("error", reject);
 
-      https.listen(443, () => {
+      https.listen(port, () => {
         https.removeListener("error", reject);
         resolve(https);
       });

@@ -17,7 +17,7 @@ import { ZBouncerServer } from "./server/server.mjs";
 
   const handler = new ZBouncerRequestHandlerForward(domains, logger);
   const generator = new ZBouncerCertGeneratorSelfSigned(security, logger);
-  const factory = new ZBouncerServerFactoryHttps(generator, handler);
+  const factory = new ZBouncerServerFactoryHttps(server, generator, handler);
 
   await Promise.all(
     [new ZBouncerServer(factory, logger)].map((s) => s.start()),
