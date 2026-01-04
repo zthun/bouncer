@@ -1,5 +1,5 @@
 import { ZLoggerSilent } from "@zthun/lumberjacky-log";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { ZBouncerCertGeneratorSelfSigned } from "../cert/cert-generator-self-signed.mjs";
 import { ZBouncerConfigServerBuilder } from "../config/config-server.mjs";
 import { ZBouncerRequestHandlerForward } from "../request/request-handler-forward.mjs";
@@ -16,14 +16,14 @@ describe("Https", () => {
 
   let _proxy: IZBouncerServer;
 
-  beforeAll(async () => {
+  beforeEach(async () => {
     _proxy = new ZBouncerServer(factory, logger);
 
     await _proxy.start();
     await _proxy.start();
   });
 
-  afterAll(async () => {
+  afterEach(async () => {
     await _proxy.stop();
     await _proxy.stop();
   });
