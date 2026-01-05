@@ -30,7 +30,7 @@ export class ZBouncerNodeServerFactoryHttp implements IZBouncerNodeServerFactory
     return new Promise((resolve, reject) => {
       const port = firstDefined(80, this._config.port);
       const request = this._handler.handle.bind(this._handler);
-      const upgrade = this._handler.upgrade?.bind(this._handler);
+      const upgrade = this._handler.upgrade.bind(this._handler);
 
       const http = createServer(request)
         .once("error", reject)
