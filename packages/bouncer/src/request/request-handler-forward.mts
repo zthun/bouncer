@@ -221,17 +221,9 @@ export class ZBouncerRequestHandlerForward implements IZBouncerRequestHandler {
         socket.destroy();
       })
       .on("upgrade", (proxyRes, proxySocket, proxyHead) => {
-        const headers = proxyRes.rawHeaders
-          .reduce<string[]>((accum, current, i, all) => {
-            const isHeaderName = i % 2 === 0;
-
-            if (isHeaderName) {
-              accum.push(`${current}: ${all[i + 1]}`);
-            }
-
-            return accum;
-          }, [])
-          .join(Eol);
+        const casted = this._castHeaders(proxyRes.headers).entries();
+        const lines = Array.from(casted).map(([k, v]) => `${k}: ${v}`);
+        const headers = lines.join(Eol);
 
         socket.write(`${Http} 101 Switching Protocols${Eol}${headers}${Eos}`);
         proxySocket.write(head);
