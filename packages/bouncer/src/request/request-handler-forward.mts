@@ -1,12 +1,10 @@
 import { createError, firstDefined, firstTruthy } from "@zthun/helpful-fn";
-import type { RequestInit as URequestInit } from "undici-types";
-
 import {
   ZLogEntryBuilder,
   ZLoggerContext,
   type IZLogger,
 } from "@zthun/lumberjacky-log";
-import { castArray, get } from "lodash-es";
+import { castArray, get, set } from "lodash-es";
 import type {
   IncomingHttpHeaders,
   IncomingMessage,
@@ -24,7 +22,7 @@ import type { IZBouncerRequestHandler } from "./request-handler.mjs";
  */
 export const HttpErrorBadGateway = 502;
 
-const Http = "Http/1.1";
+const Http = "HTTP/1.1";
 const Eol = "\r\n";
 const Eos = `${Eol}${Eol}`;
 
@@ -91,7 +89,7 @@ export class ZBouncerRequestHandlerForward implements IZBouncerRequestHandler {
         // This is a special case.  If the actual value is set to null,
         // then we are done since this path is essentially black listed
         // explicitly
-        return null;
+        break;
       }
 
       if (mapped != null) {
@@ -109,6 +107,8 @@ export class ZBouncerRequestHandlerForward implements IZBouncerRequestHandler {
       cursor = firstTruthy("/", cursor.substring(0, lastSlash));
     }
 
+    const msg = `No mapping exists for ${host}${pathname}`;
+    this._logger.log(new ZLogEntryBuilder().warning().message(msg).build());
     return null;
   }
 
@@ -135,9 +135,6 @@ export class ZBouncerRequestHandlerForward implements IZBouncerRequestHandler {
     const url = this._findRoute(firstDefined("", host), path);
 
     if (!url) {
-      msg = `No mapping exists for ${req.url}`;
-      this._logger.log(new ZLogEntryBuilder().warning().message(msg).build());
-
       res.writeHead(404).end("Not Found");
       return;
     }
@@ -145,14 +142,14 @@ export class ZBouncerRequestHandlerForward implements IZBouncerRequestHandler {
     msg = `Forwarding to ${url}`;
     this._logger.log(new ZLogEntryBuilder().info().message(msg).build());
 
-    const init: RequestInit & URequestInit = {
+    const init: RequestInit = {
       method,
       headers: this._castHeaders(req.headers),
       redirect: "manual",
     };
 
     if (!NoBodyVerbs.includes(method)) {
-      init.duplex = "half";
+      set(init, "duplex", "half");
       init.body = req as any;
     }
 
@@ -193,8 +190,6 @@ export class ZBouncerRequestHandlerForward implements IZBouncerRequestHandler {
     const url = this._findRoute(firstDefined("", host), path);
 
     if (!url) {
-      const msg = `No websocket mapping exists for ${host}${path}`;
-      this._logger.log(new ZLogEntryBuilder().warning().message(msg).build());
       socket.write(`${Http} 404 Not Found${Eos}`);
       socket.destroy();
       return;
@@ -204,7 +199,7 @@ export class ZBouncerRequestHandlerForward implements IZBouncerRequestHandler {
     const msg = `Forwarding websocket to ${target.toString()}`;
     this._logger.log(new ZLogEntryBuilder().info().message(msg).build());
 
-    const isSecure = target.protocol === "https:";
+    const isSecure = ["https:", "wss:"].includes(target.protocol);
     const proxy = isSecure ? httpsRequest : httpRequest;
     const port = target.port ? Number(target.port) : isSecure ? 443 : 80;
     const options = {
@@ -226,12 +221,19 @@ export class ZBouncerRequestHandlerForward implements IZBouncerRequestHandler {
         socket.destroy();
       })
       .on("upgrade", (proxyRes, proxySocket, proxyHead) => {
-        const heads = this._castHeaders(proxyRes.headers);
-        const lines = Array.from(heads).map(([k, v]) => `${k}: ${v}`);
-        const headers = lines.join(Eol);
+        const headers = proxyRes.rawHeaders
+          .reduce<string[]>((accum, current, i, all) => {
+            const isHeaderName = i % 2 === 0;
+
+            if (isHeaderName) {
+              accum.push(`${current}: ${all[i + 1]}`);
+            }
+
+            return accum;
+          }, [])
+          .join(Eol);
 
         socket.write(`${Http} 101 Switching Protocols${Eol}${headers}${Eos}`);
-
         proxySocket.write(head);
         socket.write(proxyHead);
         proxySocket.pipe(socket).pipe(proxySocket);
