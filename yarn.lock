@@ -3773,7 +3773,6 @@ __metadata:
     tsx: "npm:^4.21.0"
     typedoc: "npm:^0.28.15"
     typescript: "npm:~5.9.3"
-    undici-types: "npm:^7.18.0"
     vite: "npm:^7.3.0"
     vitest: "npm:^4.0.16"
   bin:
@@ -12826,13 +12825,6 @@ __metadata:
     has-symbols: "npm:^1.1.0"
     which-boxed-primitive: "npm:^1.1.1"
   checksum: 10c0/7dbd35ab02b0e05fe07136c72cb9355091242455473ec15057c11430129bab38b7b3624019b8778d02a881c13de44d63cd02d122ee782fb519e1de7775b5b982
-  languageName: node
-  linkType: hard
-
-"undici-types@npm:^7.18.0":
-  version: 7.18.0
-  resolution: "undici-types@npm:7.18.0"
-  checksum: 10c0/1b72bbd38d61f27422e6a89c464821853fba296f2b955894f5069d2d0f6b1b93e8717f0564a96c7584e852af11d9bcc7185f5c7957746fafcc9c154b34eeadbb
   languageName: node
   linkType: hard
 
