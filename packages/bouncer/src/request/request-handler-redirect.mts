@@ -5,6 +5,7 @@ import {
   type IZLogger,
 } from "@zthun/lumberjacky-log";
 import type { IncomingMessage, ServerResponse } from "node:http";
+import type { Duplex } from "node:stream";
 import type { IZBouncerRequestHandler } from "./request-handler.mjs";
 
 /**
@@ -33,5 +34,12 @@ export class ZBouncerRequestHandlerRedirect implements IZBouncerRequestHandler {
 
     this._logger.log(new ZLogEntryBuilder().info().message(message).build());
     res.writeHead(308, { Location: location }).end();
+  }
+
+  public upgrade(_: IncomingMessage, socket: Duplex): void {
+    const msg = `Redirect upgrade: not supported`;
+    this._logger.log(new ZLogEntryBuilder().warning().message(msg).build());
+    socket.write("HTTP/1.1 505 Not Supported\r\n\r\n");
+    socket.destroy();
   }
 }

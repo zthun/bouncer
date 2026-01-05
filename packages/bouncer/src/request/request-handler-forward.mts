@@ -12,7 +12,9 @@ import type {
   IncomingMessage,
   ServerResponse,
 } from "node:http";
-import { Readable } from "node:stream";
+import { request as httpRequest } from "node:http";
+import { request as httpsRequest } from "node:https";
+import { Readable, type Duplex } from "node:stream";
 import type { ZBouncerDomainMap } from "../config/config-server.mjs";
 import type { IZBouncerRequestHandler } from "./request-handler.mjs";
 
@@ -187,5 +189,84 @@ export class ZBouncerRequestHandlerForward implements IZBouncerRequestHandler {
       .catch((reason) => {
         this._streamError(reason, res);
       });
+  }
+
+  public upgrade(req: IncomingMessage, socket: Duplex, head: Buffer) {
+    const path = firstTruthy("/", req.url);
+    const host = req.headers.host;
+    const url = this._findRoute(firstDefined("", host), path);
+
+    if (!url) {
+      const msg = `No websocket mapping exists for ${host}${path}`;
+      this._logger.log(new ZLogEntryBuilder().warning().message(msg).build());
+      socket.write("HTTP/1.1 404 Not Found\r\n\r\n");
+      socket.destroy();
+      return;
+    }
+
+    const target = new URL(url);
+    const msg = `Forwarding websocket to ${target.toString()}`;
+    this._logger.log(new ZLogEntryBuilder().info().message(msg).build());
+
+    const isSecure = target.protocol === "https:";
+    const proxy = isSecure ? httpsRequest : httpRequest;
+    const port = target.port ? Number(target.port) : isSecure ? 443 : 80;
+    const options = {
+      hostname: target.hostname,
+      port,
+      path: `${target.pathname}${target.search}`,
+      method: "GET",
+      headers: {
+        ...req.headers,
+        host: target.host,
+      },
+    };
+
+    proxy(options)
+      .on("error", (reason) => {
+        const error = createError(reason);
+        const errMsg = error.message;
+        this._logger.log(
+          new ZLogEntryBuilder().error().message(errMsg).build(),
+        );
+        socket.write("HTTP/1.1 502 Bad Gateway\r\n\r\n");
+        socket.destroy();
+      })
+      .on("upgrade", (proxyRes, proxySocket, proxyHead) => {
+        const headerLines = proxyRes.rawHeaders.reduce<string[]>(
+          (acc, value, index, arr) => {
+            if (index % 2 === 0) {
+              acc.push(`${value}: ${arr[index + 1]}`);
+            }
+            return acc;
+          },
+          [],
+        );
+
+        socket.write(
+          `HTTP/1.1 101 Switching Protocols\r\n${headerLines.join("\r\n")}\r\n\r\n`,
+        );
+
+        if (head?.length) {
+          proxySocket.write(head);
+        }
+
+        if (proxyHead?.length) {
+          socket.write(proxyHead);
+        }
+
+        proxySocket.pipe(socket).pipe(proxySocket);
+
+        proxySocket.on("error", () => socket.destroy());
+        socket.on("error", () => proxySocket.destroy());
+      })
+      .on("response", (proxyRes) => {
+        // Target did not accept websocket; mirror response then close.
+        socket.write(
+          `HTTP/1.1 ${proxyRes.statusCode} ${proxyRes.statusMessage}\r\n\r\n`,
+        );
+        socket.destroy();
+      })
+      .end();
   }
 }
