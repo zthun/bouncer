@@ -1,5 +1,5 @@
 {
-  "name": "@zthun/bouncer-web",
+  "name": "@zthun/bouncer-docs",
   "version": "4.0.0",
   "description": "A documentation website for showing bouncer.",
   "author": "Anthony Bonta",
@@ -8,16 +8,18 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/zthun/bouncer",
-    "directory": "packages/bouncer-web"
+    "directory": "packages/bouncer-docs"
   },
   "main": "./dist/main.js",
   "scripts": {
-    "build": "echo build"
+    "build": "typedoc"
   },
   "publishConfig": {
     "access": "public"
   },
   "devDependencies": {
+    "@zthun/bouncer": "^4.0.0",
+    "typedoc": "^0.28.15",
     "typescript": "~5.9.3"
   },
   "files": [
