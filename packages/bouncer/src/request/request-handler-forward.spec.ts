@@ -1,6 +1,7 @@
 import { firstDefined } from "@zthun/helpful-fn";
 import { ZLoggerSilent } from "@zthun/lumberjacky-log";
 import { ZMimeTypeText, ZUrlBuilder } from "@zthun/webigail-url";
+import { createHash, randomBytes } from "node:crypto";
 import type {
   IncomingHttpHeaders,
   IncomingMessage,
@@ -10,6 +11,8 @@ import type {
 import { createServer } from "node:http";
 import type { RequestOptions } from "node:https";
 import { Agent, request } from "node:https";
+import type { Duplex } from "node:stream";
+import { connect as tlsConnect, type ConnectionOptions } from "node:tls";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { ZBouncerCertGeneratorSelfSigned } from "../cert/cert-generator-self-signed.mjs";
 import { ZBouncerConfigServerBuilder } from "../config/config-server.mjs";
@@ -32,6 +35,8 @@ describe("Handler Forward", () => {
       "/echo": "http://localhost:9001",
       "/no-body": "http://localhost:9002",
       "/stream-error": "http://localhost:9003",
+      "/websocket": "http://localhost:9104",
+      "/websocket-bad-gateway": "http://localhost:9105",
     },
   };
 
@@ -46,6 +51,7 @@ describe("Handler Forward", () => {
   let _serverNoBody: Server;
   let _serverEcho: Server;
   let _serverError: Server;
+  let _serverWebsocket: Server;
 
   beforeAll(async () => {
     _proxy = new ZBouncerServer(factory, logger);
@@ -58,18 +64,21 @@ describe("Handler Forward", () => {
     _serverEcho = createServer();
     _serverNoBody = createServer();
     _serverError = createServer();
+    _serverWebsocket = createServer();
 
     _server8080.on("request", writeBackPort.bind(null, 8080));
     _server8081.on("request", writeBackPort.bind(null, 8081));
     _serverEcho.on("request", echoBody);
     _serverNoBody.on("request", returnNoBody);
     _serverError.on("request", writeChunkThenError);
+    _serverWebsocket.on("upgrade", acceptWebsocket);
 
     _server8080.listen(8080);
     _server8081.listen(8081);
     _serverEcho.listen(9001);
     _serverNoBody.listen(9002);
     _serverError.listen(9003);
+    _serverWebsocket.listen(9104);
   });
 
   afterAll(async () => {
@@ -81,6 +90,7 @@ describe("Handler Forward", () => {
     _serverEcho.close();
     _serverNoBody.close();
     _serverError.close();
+    _serverWebsocket.close();
   });
 
   function writeBackPort(
@@ -120,6 +130,35 @@ describe("Handler Forward", () => {
     res.writeHead(200, { "content-type": ZMimeTypeText.Plain });
     res.write("partial");
     res.destroy(new Error("stream error"));
+  }
+
+  function websocketAcceptKey(key: string | string[] | undefined) {
+    const unwrapped = Array.isArray(key) ? key[0] : key;
+    const seed = firstDefined("", unwrapped);
+    return createHash("sha1")
+      .update(seed + "258EAFA5-E914-47DA-95CA-C5AB0DC85B11")
+      .digest("base64");
+  }
+
+  function acceptWebsocket(req: IncomingMessage, socket: Duplex, head: Buffer) {
+    const accept = websocketAcceptKey(req.headers["sec-websocket-key"]);
+    const headers = [
+      "HTTP/1.1 101 Switching Protocols",
+      "Upgrade: websocket",
+      "Connection: Upgrade",
+      `Sec-WebSocket-Accept: ${accept}`,
+      "\r\n",
+    ].join("\r\n");
+
+    socket.write(headers);
+
+    if (head?.length) {
+      socket.write(head);
+    }
+
+    socket.on("data", (chunk) => {
+      socket.write(chunk);
+    });
   }
 
   function invokeUrl(url: string, method: string = "GET", body?: string) {
@@ -217,6 +256,74 @@ describe("Handler Forward", () => {
       method,
       body,
     );
+  }
+
+  async function openWebsocket(path: string) {
+    return new Promise<{
+      socket: ReturnType<typeof tlsConnect>;
+      header: string;
+      remainder: Buffer;
+    }>((resolve, reject) => {
+      const options: ConnectionOptions = {
+        host: "localhost",
+        port: 443,
+        rejectUnauthorized: false,
+        ALPNProtocols: ["http/1.1"],
+      };
+
+      const socket = tlsConnect(options, () => {
+        const key = randomBytes(16).toString("base64");
+        const upgrade = [
+          `GET ${path} HTTP/1.1`,
+          "Host: localhost",
+          "Upgrade: websocket",
+          "Connection: Upgrade",
+          "Sec-WebSocket-Version: 13",
+          `Sec-WebSocket-Key: ${key}`,
+          "\r\n",
+        ].join("\r\n");
+
+        socket.write(upgrade);
+      });
+
+      let buffer = Buffer.alloc(0);
+
+      socket.on("data", (chunk) => {
+        buffer = Buffer.concat([buffer, Buffer.from(chunk)]);
+        const boundary = buffer.indexOf("\r\n\r\n");
+
+        if (boundary >= 0) {
+          const header = buffer.subarray(0, boundary + 4).toString("utf-8");
+          const remainder = buffer.subarray(boundary + 4);
+          socket.removeAllListeners("data");
+          resolve({ socket, header, remainder });
+        }
+      });
+
+      socket.once("error", reject);
+    });
+  }
+
+  function waitForData(socket: ReturnType<typeof tlsConnect>, seed?: Buffer) {
+    return new Promise<string>((resolve, reject) => {
+      const collected = seed?.length ? [seed] : [];
+      const timeout = setTimeout(
+        () => reject(new Error("Timed out waiting for data.")),
+        2000,
+      );
+
+      socket.on("data", (chunk) => {
+        collected.push(Buffer.from(chunk));
+        const text = Buffer.concat(collected).toString("utf-8");
+
+        if (text.length) {
+          clearTimeout(timeout);
+          resolve(text);
+        }
+      });
+
+      socket.once("error", reject);
+    });
   }
 
   describe("Missing config entry", () => {
@@ -399,6 +506,45 @@ describe("Handler Forward", () => {
 
       // Assert.
       expect(actual).toMatchObject({ status: 502 });
+    });
+  });
+
+  describe("Upgrade to Websocket", () => {
+    it("should upgrade the connection and proxy traffic", async () => {
+      // Arrange.
+      const { socket, header, remainder } = await openWebsocket("/websocket");
+      const handshake = header.includes("101 Switching Protocols");
+
+      // Act
+      socket.write("ping-websocket");
+      const echoed = await waitForData(socket, remainder);
+
+      // Assert.
+      expect(handshake).toBeTruthy();
+      expect(echoed).toContain("ping-websocket");
+      socket.destroy();
+    });
+
+    it("should return 404 for unmapped websocket routes", async () => {
+      // Arrange.
+
+      // Act.
+      const { socket, header } = await openWebsocket("/no-websocket-here");
+
+      // Assert.
+      expect(header).toContain("404 Not Found");
+      await new Promise((resolve) => socket.on("close", resolve));
+    });
+
+    it("should return 502 if the upstream websocket cannot be reached", async () => {
+      // Arrange.
+
+      // Act.
+      const { socket, header } = await openWebsocket("/websocket-bad-gateway");
+
+      // Assert.
+      expect(header).toContain("502 Bad Gateway");
+      await new Promise((resolve) => socket.on("close", resolve));
     });
   });
 });

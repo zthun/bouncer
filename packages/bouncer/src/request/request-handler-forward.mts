@@ -121,34 +121,6 @@ export class ZBouncerRequestHandlerForward implements IZBouncerRequestHandler {
     return forward;
   }
 
-  private _streamResponse(response: Response, res: ServerResponse) {
-    const bodyStream = response.body
-      ? Readable.fromWeb(response.body as any)
-      : null;
-
-    if (!bodyStream) {
-      res.end();
-      return;
-    }
-
-    res.on("close", () => {
-      bodyStream.destroy();
-    });
-
-    bodyStream.pipe(res);
-  }
-
-  private _streamError(reason: any, res: ServerResponse) {
-    const code = get(reason, "code", "UNKNOWN");
-    const status = firstDefined(HttpErrorBadGateway, CodeToHttpError[code]);
-
-    const error = createError(reason);
-    const msg = error.message;
-    this._logger.log(new ZLogEntryBuilder().error().message(msg).build());
-
-    res.writeHead(status).end();
-  }
-
   public handle(req: IncomingMessage, res: ServerResponse) {
     const method = firstDefined("GET", req.method).toUpperCase();
     const path = firstTruthy("/", req.url);
@@ -184,10 +156,30 @@ export class ZBouncerRequestHandlerForward implements IZBouncerRequestHandler {
       .then(async (response) => {
         response.headers.forEach((value, key) => res.setHeader(key, value));
         res.writeHead(response.status);
-        this._streamResponse(response, res);
+        const bodyStream = response.body
+          ? Readable.fromWeb(response.body as any)
+          : null;
+
+        if (!bodyStream) {
+          res.end();
+          return;
+        }
+
+        res.on("close", () => {
+          bodyStream.destroy();
+        });
+
+        bodyStream.pipe(res);
       })
       .catch((reason) => {
-        this._streamError(reason, res);
+        const code = get(reason, "code", "UNKNOWN");
+        const status = firstDefined(HttpErrorBadGateway, CodeToHttpError[code]);
+
+        const error = createError(reason);
+        const msg = error.message;
+        this._logger.log(new ZLogEntryBuilder().error().message(msg).build());
+
+        res.writeHead(status).end();
       });
   }
 
@@ -257,8 +249,8 @@ export class ZBouncerRequestHandlerForward implements IZBouncerRequestHandler {
 
         proxySocket.pipe(socket).pipe(proxySocket);
 
-        proxySocket.on("error", () => socket.destroy());
-        socket.on("error", () => proxySocket.destroy());
+        proxySocket.on("error", socket.destroy.bind(socket));
+        socket.on("error", proxySocket.destroy.bind(proxySocket));
       })
       .on("response", (proxyRes) => {
         // Target did not accept websocket; mirror response then close.
