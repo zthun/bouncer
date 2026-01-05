@@ -24,6 +24,10 @@ import type { IZBouncerRequestHandler } from "./request-handler.mjs";
  */
 export const HttpErrorBadGateway = 502;
 
+const Http = "Http/1.1";
+const Eol = "\r\n";
+const Eos = `${Eol}${Eol}`;
+
 // Partial codes to overrides.  Anything not found in this map, should
 // result in DefaultErrorCode
 const CodeToHttpError: Record<string, number> = {
@@ -191,7 +195,7 @@ export class ZBouncerRequestHandlerForward implements IZBouncerRequestHandler {
     if (!url) {
       const msg = `No websocket mapping exists for ${host}${path}`;
       this._logger.log(new ZLogEntryBuilder().warning().message(msg).build());
-      socket.write("HTTP/1.1 404 Not Found\r\n\r\n");
+      socket.write(`${Http} 404 Not Found${Eos}`);
       socket.destroy();
       return;
     }
@@ -216,47 +220,28 @@ export class ZBouncerRequestHandlerForward implements IZBouncerRequestHandler {
 
     proxy(options)
       .on("error", (reason) => {
-        const error = createError(reason);
-        const errMsg = error.message;
-        this._logger.log(
-          new ZLogEntryBuilder().error().message(errMsg).build(),
-        );
-        socket.write("HTTP/1.1 502 Bad Gateway\r\n\r\n");
+        const { message: msg } = createError(reason);
+        this._logger.log(new ZLogEntryBuilder().error().message(msg).build());
+        socket.write(`${Http} 502 Bad Gateway${Eos}`);
         socket.destroy();
       })
       .on("upgrade", (proxyRes, proxySocket, proxyHead) => {
-        const headerLines = proxyRes.rawHeaders.reduce<string[]>(
-          (acc, value, index, arr) => {
-            if (index % 2 === 0) {
-              acc.push(`${value}: ${arr[index + 1]}`);
-            }
-            return acc;
-          },
-          [],
-        );
+        const heads = this._castHeaders(proxyRes.headers);
+        const lines = Array.from(heads).map(([k, v]) => `${k}: ${v}`);
+        const headers = lines.join(Eol);
 
-        socket.write(
-          `HTTP/1.1 101 Switching Protocols\r\n${headerLines.join("\r\n")}\r\n\r\n`,
-        );
+        socket.write(`${Http} 101 Switching Protocols${Eol}${headers}${Eos}`);
 
-        if (head?.length) {
-          proxySocket.write(head);
-        }
-
-        if (proxyHead?.length) {
-          socket.write(proxyHead);
-        }
-
+        proxySocket.write(head);
+        socket.write(proxyHead);
         proxySocket.pipe(socket).pipe(proxySocket);
-
         proxySocket.on("error", socket.destroy.bind(socket));
         socket.on("error", proxySocket.destroy.bind(proxySocket));
       })
       .on("response", (proxyRes) => {
         // Target did not accept websocket; mirror response then close.
-        socket.write(
-          `HTTP/1.1 ${proxyRes.statusCode} ${proxyRes.statusMessage}\r\n\r\n`,
-        );
+        const { statusCode: code, statusMessage: msg } = proxyRes;
+        socket.write(`${Http} ${code} ${msg}${Eos}`);
         socket.destroy();
       })
       .end();
