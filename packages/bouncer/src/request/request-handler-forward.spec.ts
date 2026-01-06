@@ -16,10 +16,7 @@ import { connect as tlsConnect, type ConnectionOptions } from "node:tls";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { ZBouncerCertGeneratorSelfSigned } from "../cert/cert-generator-self-signed.mjs";
 import { ZBouncerConfigServerBuilder } from "../config/config-server.mjs";
-import {
-  HttpErrorBadGateway,
-  ZBouncerRequestHandlerForward,
-} from "../request/request-handler-forward.mjs";
+import { ZBouncerRequestHandlerForward } from "../request/request-handler-forward.mjs";
 import { ZBouncerNodeServerFactoryHttps } from "../server/node-server-factory-https.mjs";
 import { ZBouncerServer, type IZBouncerServer } from "../server/server.mjs";
 
@@ -442,7 +439,7 @@ describe("Handler Forward", () => {
       const { status } = response;
 
       // Assert.
-      expect(status).toEqual(HttpErrorBadGateway);
+      expect(status).toEqual(502);
     });
 
     it("should return a 404 if the api path is shut down (to points to falsy)", async () => {
@@ -510,41 +507,58 @@ describe("Handler Forward", () => {
   });
 
   describe("Upgrade to Websocket", () => {
+    it("should respond with switching protocols if successful", async () => {
+      // Arrange.
+      const { header } = await openWebsocket("/websocket");
+
+      // Act
+      const actual = header.includes("101 Switching Protocols");
+
+      // Assert.
+      expect(actual).toBeTruthy();
+    });
+
     it("should upgrade the connection and proxy traffic", async () => {
       // Arrange.
-      const { socket, header, remainder } = await openWebsocket("/websocket");
-      const handshake = header.includes("101 Switching Protocols");
+      const { socket, remainder } = await openWebsocket("/websocket");
 
       // Act
       socket.write("ping-websocket");
       const echoed = await waitForData(socket, remainder);
 
       // Assert.
-      expect(handshake).toBeTruthy();
       expect(echoed).toContain("ping-websocket");
-      socket.destroy();
     });
 
     it("should return 404 for unmapped websocket routes", async () => {
       // Arrange.
 
       // Act.
-      const { socket, header } = await openWebsocket("/no-websocket-here");
+      const { header } = await openWebsocket("/no-websocket-here");
 
       // Assert.
       expect(header).toContain("404 Not Found");
-      await new Promise((resolve) => socket.on("close", resolve));
     });
 
     it("should return 502 if the upstream websocket cannot be reached", async () => {
       // Arrange.
 
       // Act.
-      const { socket, header } = await openWebsocket("/websocket-bad-gateway");
+      const { header } = await openWebsocket("/websocket-bad-gateway");
 
       // Assert.
       expect(header).toContain("502 Bad Gateway");
-      await new Promise((resolve) => socket.on("close", resolve));
+    });
+
+    it("should return the last result if the upstream does not accept the web socket", async () => {
+      // Arrange.
+
+      // Act.
+      const { header } = await openWebsocket("/eighty-eighty");
+      const actual = header.includes("200 OK");
+
+      // Assert.
+      expect(actual).toBeTruthy();
     });
   });
 });
