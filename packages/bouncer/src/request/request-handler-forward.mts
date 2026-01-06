@@ -10,10 +10,9 @@ import type {
   IncomingMessage,
   ServerResponse,
 } from "node:http";
-import { request as httpRequest } from "node:http";
-import { request as httpsRequest } from "node:https";
 import { Readable, type Duplex } from "node:stream";
 import type { ZBouncerDomainMap } from "../config/config-server.mjs";
+import { forwardRequest } from "./forward-request.mjs";
 import type { IZBouncerRequestHandler } from "./request-handler.mjs";
 
 /**
@@ -199,21 +198,7 @@ export class ZBouncerRequestHandlerForward implements IZBouncerRequestHandler {
     const msg = `Forwarding websocket to ${target.toString()}`;
     this._logger.log(new ZLogEntryBuilder().info().message(msg).build());
 
-    const isSecure = ["https:", "wss:"].includes(target.protocol);
-    const proxy = isSecure ? httpsRequest : httpRequest;
-    const port = target.port ? Number(target.port) : isSecure ? 443 : 80;
-    const options = {
-      hostname: target.hostname,
-      port,
-      path: `${target.pathname}${target.search}`,
-      method: "GET",
-      headers: {
-        ...req.headers,
-        host: target.host,
-      },
-    };
-
-    proxy(options)
+    forwardRequest(target, { headers: req.headers })
       .on("error", (reason) => {
         const { message: msg } = createError(reason);
         this._logger.log(new ZLogEntryBuilder().error().message(msg).build());
