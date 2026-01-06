@@ -509,10 +509,11 @@ describe("Handler Forward", () => {
   describe("Upgrade to Websocket", () => {
     it("should respond with switching protocols if successful", async () => {
       // Arrange.
-      const { header } = await openWebsocket("/websocket");
+      const { socket, header } = await openWebsocket("/websocket");
 
       // Act
       const actual = header.includes("101 Switching Protocols");
+      socket.end();
 
       // Assert.
       expect(actual).toBeTruthy();
@@ -525,6 +526,7 @@ describe("Handler Forward", () => {
       // Act
       socket.write("ping-websocket");
       const echoed = await waitForData(socket, remainder);
+      socket.end();
 
       // Assert.
       expect(echoed).toContain("ping-websocket");
@@ -534,7 +536,8 @@ describe("Handler Forward", () => {
       // Arrange.
 
       // Act.
-      const { header } = await openWebsocket("/no-websocket-here");
+      const { socket, header } = await openWebsocket("/no-websocket-here");
+      socket.end();
 
       // Assert.
       expect(header).toContain("404 Not Found");
@@ -544,7 +547,8 @@ describe("Handler Forward", () => {
       // Arrange.
 
       // Act.
-      const { header } = await openWebsocket("/websocket-bad-gateway");
+      const { socket, header } = await openWebsocket("/websocket-bad-gateway");
+      socket.end();
 
       // Assert.
       expect(header).toContain("502 Bad Gateway");
@@ -554,8 +558,9 @@ describe("Handler Forward", () => {
       // Arrange.
 
       // Act.
-      const { header } = await openWebsocket("/eighty-eighty");
+      const { socket, header } = await openWebsocket("/eighty-eighty");
       const actual = header.includes("200 OK");
+      socket.end();
 
       // Assert.
       expect(actual).toBeTruthy();
