@@ -202,6 +202,7 @@ export class ZBouncerRequestHandlerForward implements IZBouncerRequestHandler {
         const { statusCode: code, statusMessage: msg } = proxyRes;
         socket.write(`${Http} ${code} ${msg}${Eos}`);
         socket.destroy();
+        proxyRes.resume();
       })
       .end();
   }
