@@ -112,29 +112,33 @@ export class ZBouncerRequestHandlerForward implements IZBouncerRequestHandler {
     return forward;
   }
 
+  private _processError(res: ServerResponse, reason: Error) {
+    const code = get(reason, "code", "UNKNOWN");
+    const status = firstDefined(BadGateway, CodeToHttpError[code]);
+    const { message: msg } = createError(reason);
+    this._logger.log(new ZLogEntryBuilder().error().message(msg).build());
+
+    if (!res.headersSent) {
+      res.writeHead(status);
+    } else if (!res.writableEnded) {
+      res.statusCode = status;
+    }
+
+    res.end();
+  }
+
   public handle(req: IncomingMessage, res: ServerResponse) {
     const method = firstDefined("GET", req.method).toUpperCase();
     const url = this._findRoute(req);
 
     if (!url) {
-      res.writeHead(NotFound).end(NotFoundMsg);
+      res.writeHead(NotFound, NotFoundMsg).end();
       return;
     }
 
     const headers = this._castHeaders(req.headers);
     const outbound = forwardRequest(url, { method, headers })
-      .on("error", (reason: unknown) => {
-        const code = get(reason, "code", "UNKNOWN");
-        const status = firstDefined(BadGateway, CodeToHttpError[code]);
-        const { message: msg } = createError(reason);
-        this._logger.log(new ZLogEntryBuilder().error().message(msg).build());
-
-        if (!res.headersSent) {
-          res.writeHead(status).end();
-        } else {
-          res.destroy();
-        }
-      })
+      .on("error", this._processError.bind(this, res))
       .on("response", (msg) => {
         const { headers, statusCode, statusMessage } = msg;
         const h = Object.entries(headers).filter(([, v]) => v != null);
@@ -144,14 +148,7 @@ export class ZBouncerRequestHandlerForward implements IZBouncerRequestHandler {
         res.writeHead(status, message);
         msg.pipe(res);
         res.on("close", msg.destroy.bind(msg));
-
-        msg.on("error", () => {
-          if (!res.headersSent) {
-            res.writeHead(BadGateway, BadGatewayMsg).end();
-          } else if (!res.destroyed) {
-            res.destroy();
-          }
-        });
+        msg.on("error", this._processError.bind(this, res));
       });
 
     if (!NoBodyVerbs.includes(method)) {
