@@ -7,6 +7,7 @@ import {
 import type { IncomingMessage, ServerResponse } from "node:http";
 import type { Duplex } from "node:stream";
 import type { IZBouncerRequestHandler } from "./request-handler.mjs";
+import { Eol, Eos, Http, Redirect, RedirectMsg } from "./request-status.mjs";
 
 /**
  * A redirect handler that is mostly to redirect to a different protocol.
@@ -36,10 +37,15 @@ export class ZBouncerRequestHandlerRedirect implements IZBouncerRequestHandler {
     res.writeHead(308, { Location: location }).end();
   }
 
-  public upgrade(_: IncomingMessage, socket: Duplex): void {
-    const msg = `Redirect upgrade: not supported`;
-    this._logger.log(new ZLogEntryBuilder().warning().message(msg).build());
-    socket.write("HTTP/1.1 505 Not Supported\r\n\r\n");
+  public upgrade(req: IncomingMessage, socket: Duplex): void {
+    const path = firstTruthy("/", req.url);
+    const host = firstDefined("", req.headers.host);
+    const location = `wss://${host}${path}`;
+    const message = `Redirecting upgrade ${host}${path} to ${location}`;
+    const to = `Location: ${location}`;
+
+    this._logger.log(new ZLogEntryBuilder().info().message(message).build());
+    socket.write(`${Http} ${Redirect} ${RedirectMsg}${Eol}${to}${Eos}`);
     socket.destroy();
   }
 }
