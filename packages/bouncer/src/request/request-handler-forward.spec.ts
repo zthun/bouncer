@@ -303,6 +303,32 @@ describe("Handler Forward", () => {
     });
   }
 
+  function invokeAndCloseAfterHeaders(which: keyof typeof domains.localhost) {
+    return new Promise<void>((resolve, reject) => {
+      const url = new ZUrlBuilder()
+        .protocol("https")
+        .hostname("localhost")
+        .path(which)
+        .build();
+
+      const client = request(
+        url,
+        {
+          method: "GET",
+          agent: new Agent({ rejectUnauthorized: false }),
+          rejectUnauthorized: false,
+        },
+        () => {
+          client.destroy();
+          resolve();
+        },
+      );
+
+      client.once("error", reject);
+      client.end();
+    });
+  }
+
   function waitWithTimeout<T>(promise: Promise<T>, timeoutMs: number) {
     return new Promise<T>((resolve, reject) => {
       const timeout = setTimeout(
@@ -582,6 +608,19 @@ describe("Handler Forward", () => {
 
       // Act.
       await invokeAndAbort("/abort");
+
+      // Assert.
+      await expect(waitWithTimeout(closed, 1500)).resolves.toBeUndefined();
+    });
+
+    it("should close the upstream request when the client closes after headers", async () => {
+      // Arrange.
+      const closed = new Promise<void>((resolve) => {
+        _abortResolve = resolve;
+      });
+
+      // Act.
+      await invokeAndCloseAfterHeaders("/abort");
 
       // Assert.
       await expect(waitWithTimeout(closed, 1500)).resolves.toBeUndefined();

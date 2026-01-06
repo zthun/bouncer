@@ -150,7 +150,12 @@ export class ZBouncerRequestHandlerForward implements IZBouncerRequestHandler {
         const status = firstDefined(BadGateway, CodeToHttpError[code]);
         const { message: msg } = createError(reason);
         this._logger.log(new ZLogEntryBuilder().error().message(msg).build());
-        res.writeHead(status).end();
+
+        if (!res.headersSent) {
+          res.writeHead(status).end();
+        } else {
+          res.destroy();
+        }
       })
       .on("response", (msg) => {
         const { headers, statusCode, statusMessage } = msg;
@@ -160,6 +165,15 @@ export class ZBouncerRequestHandlerForward implements IZBouncerRequestHandler {
         const message = firstDefined(SuccessMsg, statusMessage);
         res.writeHead(status, message);
         msg.pipe(res);
+        res.on("close", msg.destroy.bind(msg));
+
+        msg.on("error", () => {
+          if (!res.headersSent) {
+            res.writeHead(BadGateway, BadGatewayMsg).end();
+          } else if (!res.destroyed) {
+            res.destroy();
+          }
+        });
       });
 
     if (!NoBodyVerbs.includes(method)) {
@@ -169,6 +183,12 @@ export class ZBouncerRequestHandlerForward implements IZBouncerRequestHandler {
     }
 
     req.on("aborted", outbound.destroy.bind(outbound));
+
+    req.on("close", () => {
+      if (!req.complete) {
+        outbound.destroy();
+      }
+    });
 
     res.on("close", () => {
       if (!res.writableEnded) {
