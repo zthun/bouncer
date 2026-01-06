@@ -32,6 +32,7 @@ describe("Handler Forward", () => {
       "/echo": "http://localhost:9001",
       "/no-body": "http://localhost:9002",
       "/stream-error": "http://localhost:9003",
+      "/abort": "http://localhost:9004",
       "/websocket": "http://localhost:9104",
       "/websocket-bad-gateway": "http://localhost:9105",
     },
@@ -48,6 +49,7 @@ describe("Handler Forward", () => {
   let _serverNoBody: Server;
   let _serverEcho: Server;
   let _serverError: Server;
+  let _serverAbort: Server;
   let _serverWebsocket: Server;
 
   beforeAll(async () => {
@@ -61,6 +63,7 @@ describe("Handler Forward", () => {
     _serverEcho = createServer();
     _serverNoBody = createServer();
     _serverError = createServer();
+    _serverAbort = createServer();
     _serverWebsocket = createServer();
 
     _server8080.on("request", writeBackPort.bind(null, 8080));
@@ -68,6 +71,7 @@ describe("Handler Forward", () => {
     _serverEcho.on("request", echoBody);
     _serverNoBody.on("request", returnNoBody);
     _serverError.on("request", writeChunkThenError);
+    _serverAbort.on("request", waitForAbort);
     _serverWebsocket.on("upgrade", acceptWebsocket);
 
     _server8080.listen(8080);
@@ -75,6 +79,7 @@ describe("Handler Forward", () => {
     _serverEcho.listen(9001);
     _serverNoBody.listen(9002);
     _serverError.listen(9003);
+    _serverAbort.listen(9004);
     _serverWebsocket.listen(9104);
   });
 
@@ -87,6 +92,7 @@ describe("Handler Forward", () => {
     _serverEcho.close();
     _serverNoBody.close();
     _serverError.close();
+    _serverAbort.close();
     _serverWebsocket.close();
   });
 
@@ -127,6 +133,18 @@ describe("Handler Forward", () => {
     res.writeHead(200, { "content-type": ZMimeTypeText.Plain });
     res.write("partial");
     res.destroy(new Error("stream error"));
+  }
+
+  let _abortResolve: (() => void) | null = null;
+
+  function waitForAbort(req: IncomingMessage, res: ServerResponse) {
+    req.on("close", () => {
+      _abortResolve?.();
+      _abortResolve = null;
+    });
+
+    res.writeHead(200, { "content-type": ZMimeTypeText.Plain });
+    res.write("holding");
   }
 
   function websocketAcceptKey(key: string | string[] | undefined) {
@@ -253,6 +271,55 @@ describe("Handler Forward", () => {
       method,
       body,
     );
+  }
+
+  function invokeAndAbort(which: keyof typeof domains.localhost) {
+    return new Promise<void>((resolve, reject) => {
+      const url = new ZUrlBuilder()
+        .protocol("https")
+        .hostname("localhost")
+        .path(which)
+        .build();
+
+      const client = request(
+        url,
+        {
+          method: "GET",
+          agent: new Agent({ rejectUnauthorized: false }),
+          rejectUnauthorized: false,
+        },
+        () => {
+          // Intentionally ignore the response, we are going to abort.
+        },
+      );
+
+      client.once("error", reject);
+      client.end();
+
+      setTimeout(() => {
+        client.destroy();
+        resolve();
+      }, 50);
+    });
+  }
+
+  function waitWithTimeout<T>(promise: Promise<T>, timeoutMs: number) {
+    return new Promise<T>((resolve, reject) => {
+      const timeout = setTimeout(
+        () => reject(new Error("Timed out waiting for abort.")),
+        timeoutMs,
+      );
+
+      promise
+        .then((value) => {
+          clearTimeout(timeout);
+          resolve(value);
+        })
+        .catch((err) => {
+          clearTimeout(timeout);
+          reject(err);
+        });
+    });
   }
 
   async function openWebsocket(path: string) {
@@ -503,6 +570,21 @@ describe("Handler Forward", () => {
 
       // Assert.
       expect(actual).toMatchObject({ status: 502 });
+    });
+  });
+
+  describe("Cleanup", () => {
+    it("should close the upstream request when the client disconnects", async () => {
+      // Arrange.
+      const closed = new Promise<void>((resolve) => {
+        _abortResolve = resolve;
+      });
+
+      // Act.
+      await invokeAndAbort("/abort");
+
+      // Assert.
+      await expect(waitWithTimeout(closed, 1500)).resolves.toBeUndefined();
     });
   });
 

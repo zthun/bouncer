@@ -167,6 +167,14 @@ export class ZBouncerRequestHandlerForward implements IZBouncerRequestHandler {
     } else {
       outbound.end();
     }
+
+    req.on("aborted", outbound.destroy.bind(outbound));
+
+    res.on("close", () => {
+      if (!res.writableEnded) {
+        outbound.destroy();
+      }
+    });
   }
 
   public upgrade(req: IncomingMessage, socket: Duplex, head: Buffer) {
@@ -196,6 +204,8 @@ export class ZBouncerRequestHandlerForward implements IZBouncerRequestHandler {
         proxySocket.pipe(socket).pipe(proxySocket);
         proxySocket.on("error", socket.destroy.bind(socket));
         socket.on("error", proxySocket.destroy.bind(proxySocket));
+        proxySocket.on("close", socket.destroy.bind(socket));
+        socket.on("close", proxySocket.destroy.bind(proxySocket));
       })
       .on("response", (proxyRes) => {
         // Target did not accept websocket; mirror response then close.
