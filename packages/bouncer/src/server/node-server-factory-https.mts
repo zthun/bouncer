@@ -37,10 +37,14 @@ export class ZBouncerNodeServerFactoryHttps implements IZBouncerNodeServerFactor
     return new Promise((resolve, reject) => {
       const port = firstDefined(443, this._config.port);
       const handle = this._handler.handle.bind(this._handler);
+      const upgrade = this._handler.upgrade.bind(this._handler);
+
       const https = createServer(certificate, handle)
         .once("error", reject)
         .listen(port, () => {
           https.removeListener("error", reject);
+          https.on("upgrade", upgrade);
+
           resolve(https);
         });
     });

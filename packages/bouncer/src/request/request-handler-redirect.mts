@@ -5,7 +5,9 @@ import {
   type IZLogger,
 } from "@zthun/lumberjacky-log";
 import type { IncomingMessage, ServerResponse } from "node:http";
+import type { Duplex } from "node:stream";
 import type { IZBouncerRequestHandler } from "./request-handler.mjs";
+import { Eol, Eos, Http, Redirect, RedirectMsg } from "./request-status.mjs";
 
 /**
  * A redirect handler that is mostly to redirect to a different protocol.
@@ -33,5 +35,17 @@ export class ZBouncerRequestHandlerRedirect implements IZBouncerRequestHandler {
 
     this._logger.log(new ZLogEntryBuilder().info().message(message).build());
     res.writeHead(308, { Location: location }).end();
+  }
+
+  public upgrade(req: IncomingMessage, socket: Duplex): void {
+    const path = firstTruthy("/", req.url);
+    const host = firstDefined("", req.headers.host);
+    const location = `wss://${host}${path}`;
+    const message = `Redirecting upgrade ${host}${path} to ${location}`;
+    const to = `Location: ${location}`;
+
+    this._logger.log(new ZLogEntryBuilder().info().message(message).build());
+    socket.write(`${Http} ${Redirect} ${RedirectMsg}${Eol}${to}${Eos}`);
+    socket.destroy();
   }
 }

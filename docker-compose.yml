@@ -12,6 +12,13 @@ services:
     depends_on:
       - bouncer-mongo-admin
       - bouncer-email
+      - bouncer-web
+  bouncer-web:
+    image: node:lts
+    volumes:
+      - .:/usr/dev
+    working_dir: /usr/dev
+    command: npm --workspace @zthun/bouncer-web run debug
   bouncer-mongo:
     image: mongo:noble
   bouncer-mongo-admin:

@@ -16,6 +16,9 @@ export default {
         "email.local.zthunworks.com": {
           "/": "http://bouncer-email",
         },
+        "bouncer.local.zthunworks.com": {
+          "/": "http://bouncer-web:5173",
+        },
       },
     },
   ],

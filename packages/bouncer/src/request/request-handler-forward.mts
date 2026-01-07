@@ -1,6 +1,4 @@
 import { createError, firstDefined, firstTruthy } from "@zthun/helpful-fn";
-import type { RequestInit as URequestInit } from "undici-types";
-
 import {
   ZLogEntryBuilder,
   ZLoggerContext,
@@ -10,42 +8,28 @@ import { castArray, get } from "lodash-es";
 import type {
   IncomingHttpHeaders,
   IncomingMessage,
+  OutgoingHttpHeaders,
   ServerResponse,
 } from "node:http";
-import { Readable } from "node:stream";
+import { type Duplex } from "node:stream";
 import type { ZBouncerDomainMap } from "../config/config-server.mjs";
+import { forwardRequest } from "./forward-request.mjs";
 import type { IZBouncerRequestHandler } from "./request-handler.mjs";
-
-/**
- * Default error code for when fetch errors happen and there's no
- * set mapping of code to error.
- */
-export const HttpErrorBadGateway = 502;
-
-// Partial codes to overrides.  Anything not found in this map, should
-// result in DefaultErrorCode
-const CodeToHttpError: Record<string, number> = {
-  // Aborted - 499 isn't standard, but it's the most widely accepted
-  // one we have for this case - see docs for NGINX
-  AbortError: 499,
-  ERR_REQUEST_ABORTED: 499,
-  // Timeout - 504 - Sometimes you'll see odd errors with this one.
-  ETIMEDOUT: 504,
-  ESOCKETTIMEDOUT: 504,
-  UND_ERR_CONNECT_TIMEOUT: 504,
-  UND_ERR_HEADERS_TIMEOUT: 504,
-  UND_ERR_BODY_TIMEOUT: 504,
-  // Out of Resources - 503 Service Unavailable
-  EMFILE: 503,
-  ENFILE: 503,
-  ENOMEM: 503,
-  EAGAIN: 503,
-};
-
-// Most HttpVerbs allow a body, but these do not allow it,
-// so we have to check to make sure that we don't forward
-// any ghost bodies with them.
-const NoBodyVerbs = ["GET", "HEAD"];
+import {
+  BadGateway,
+  BadGatewayMsg,
+  CodeToHttpError,
+  Eol,
+  Eos,
+  Http,
+  NoBodyVerbs,
+  NotFound,
+  NotFoundMsg,
+  Success,
+  SuccessMsg,
+  Switch,
+  SwitchMsg,
+} from "./request-status.mjs";
 
 /**
  * A request handler that forwards request to different domain endpoints.
@@ -66,13 +50,17 @@ export class ZBouncerRequestHandlerForward implements IZBouncerRequestHandler {
     this._logger = new ZLoggerContext("ZBouncerRequestHandlerForward", logger);
   }
 
-  private _findRoute(host: string, pathname: string): string | null {
+  private _findRoute(req: IncomingMessage): URL | null {
+    const host = firstDefined("", req.headers.host);
     const target = this._domains[host];
 
     if (target == null) {
+      const msg = `No domain mapping exists for ${host}`;
+      this._logger.log(new ZLogEntryBuilder().warning().message(msg).build());
       return null;
     }
 
+    const pathname = firstTruthy("/", req.url);
     const [_path, _query] = pathname.split("?");
     const normalized = _path.split("/").filter(Boolean).join("/");
     const path = `/${normalized}`;
@@ -85,12 +73,15 @@ export class ZBouncerRequestHandlerForward implements IZBouncerRequestHandler {
         // This is a special case.  If the actual value is set to null,
         // then we are done since this path is essentially black listed
         // explicitly
-        return null;
+        break;
       }
 
       if (mapped != null) {
         const base = mapped.replace(/\/$/, "");
-        return `${base}${path}${query}`;
+        const url = new URL(`${base}${path}${query}`);
+        const msg = `Forwarding ${host}${pathname} to ${url.toString()}`;
+        this._logger.log(new ZLogEntryBuilder().info().message(msg).build());
+        return url;
       }
 
       if (cursor === "/") {
@@ -103,89 +94,126 @@ export class ZBouncerRequestHandlerForward implements IZBouncerRequestHandler {
       cursor = firstTruthy("/", cursor.substring(0, lastSlash));
     }
 
+    const msg = `No mapping exists for ${host}${pathname}`;
+    this._logger.log(new ZLogEntryBuilder().warning().message(msg).build());
     return null;
   }
 
   private _castHeaders(headers: IncomingHttpHeaders) {
-    const forward = new Headers();
+    const forward: OutgoingHttpHeaders = {};
 
     Object.entries(headers)
       .filter(([key, value]) => key.toLowerCase() !== "host" && value != null)
       .forEach(([key, value]) => {
         const values = castArray(value);
-        values.forEach((item) => forward.append(key, String(item)));
+        forward[key] = values.map(String);
       });
 
     return forward;
   }
 
-  private _streamResponse(response: Response, res: ServerResponse) {
-    const bodyStream = response.body
-      ? Readable.fromWeb(response.body as any)
-      : null;
-
-    if (!bodyStream) {
-      res.end();
-      return;
-    }
-
-    res.on("close", () => {
-      bodyStream.destroy();
-    });
-
-    bodyStream.pipe(res);
-  }
-
-  private _streamError(reason: any, res: ServerResponse) {
+  private _processError(res: ServerResponse, reason: Error) {
     const code = get(reason, "code", "UNKNOWN");
-    const status = firstDefined(HttpErrorBadGateway, CodeToHttpError[code]);
-
-    const error = createError(reason);
-    const msg = error.message;
+    const status = firstDefined(BadGateway, CodeToHttpError[code]);
+    const { message: msg } = createError(reason);
     this._logger.log(new ZLogEntryBuilder().error().message(msg).build());
 
-    res.writeHead(status).end();
+    if (!res.headersSent) {
+      res.writeHead(status);
+    } else if (!res.writableEnded) {
+      res.statusCode = status;
+    }
+
+    if (!res.writableEnded) {
+      res.end();
+    }
   }
 
   public handle(req: IncomingMessage, res: ServerResponse) {
     const method = firstDefined("GET", req.method).toUpperCase();
-    const path = firstTruthy("/", req.url);
-    const host = req.headers.host;
-
-    let msg = `Received a request for ${method} - ${host} - ${path}`;
-    this._logger.log(new ZLogEntryBuilder().info().message(msg).build());
-    const url = this._findRoute(firstDefined("", host), path);
+    const url = this._findRoute(req);
 
     if (!url) {
-      msg = `No mapping exists for ${req.url}`;
-      this._logger.log(new ZLogEntryBuilder().warning().message(msg).build());
-
-      res.writeHead(404).end("Not Found");
+      res.writeHead(NotFound, NotFoundMsg).end();
       return;
     }
 
-    msg = `Forwarding to ${url}`;
-    this._logger.log(new ZLogEntryBuilder().info().message(msg).build());
-
-    const init: RequestInit & URequestInit = {
-      method,
-      headers: this._castHeaders(req.headers),
-      redirect: "manual",
-    };
+    const headers = this._castHeaders(req.headers);
+    const outbound = forwardRequest(url, { method, headers })
+      .on("error", this._processError.bind(this, res))
+      .on("response", (msg) => {
+        const { headers, statusCode, statusMessage } = msg;
+        const h = Object.entries(headers).filter(([, v]) => v != null);
+        h.forEach(([k, v]) => res.setHeader(k, v!));
+        const status = firstDefined(Success, statusCode);
+        const message = firstDefined(SuccessMsg, statusMessage);
+        res.writeHead(status, message);
+        msg.pipe(res);
+        res.on("close", msg.destroy.bind(msg));
+        msg.on("error", (reason) => {
+          msg.unpipe();
+          this._processError(res, reason);
+        });
+      });
 
     if (!NoBodyVerbs.includes(method)) {
-      init.duplex = "half";
-      init.body = req as any;
+      req.pipe(outbound);
+    } else {
+      outbound.end();
     }
 
-    fetch(url, init)
-      .then(async (response) => {
-        response.headers.forEach((value, key) => res.setHeader(key, value));
-        res.writeHead(response.status);
-        this._streamResponse(response, res);
+    req.on("aborted", outbound.destroy.bind(outbound));
+
+    req.on("close", () => {
+      if (!req.complete) {
+        outbound.destroy();
+      }
+    });
+
+    res.on("close", () => {
+      if (!res.writableEnded) {
+        outbound.destroy();
+      }
+    });
+  }
+
+  public upgrade(req: IncomingMessage, socket: Duplex, head: Buffer) {
+    const url = this._findRoute(req);
+
+    if (!url) {
+      socket.write(`${Http} ${NotFound} ${NotFoundMsg}${Eos}`);
+      socket.destroy();
+      return;
+    }
+
+    forwardRequest(url, { headers: req.headers })
+      .on("error", (reason) => {
+        const { message: msg } = createError(reason);
+        this._logger.log(new ZLogEntryBuilder().error().message(msg).build());
+        socket.write(`${Http} ${BadGateway} ${BadGatewayMsg}${Eos}`);
+        socket.destroy();
       })
-      .catch((reason) => {
-        this._streamError(reason, res);
-      });
+      .on("upgrade", (proxyRes, proxySocket, proxyHead) => {
+        const casted = Object.entries(this._castHeaders(proxyRes.headers));
+        const lines = Array.from(casted).map(([k, v]) => `${k}: ${v}`);
+        const headers = lines.join(Eol);
+
+        socket.write(`${Http} ${Switch} ${SwitchMsg}${Eol}${headers}${Eos}`);
+        proxySocket.write(head);
+        socket.write(proxyHead);
+        proxySocket.pipe(socket).pipe(proxySocket);
+        proxySocket.on("error", socket.destroy.bind(socket));
+        socket.on("error", proxySocket.destroy.bind(proxySocket));
+        proxySocket.on("close", socket.destroy.bind(socket));
+        socket.on("close", proxySocket.destroy.bind(proxySocket));
+      })
+      .on("response", (proxyRes) => {
+        // Target did not accept websocket; mirror response then close.
+        const { statusCode: code, statusMessage: msg } = proxyRes;
+        socket.write(`${Http} ${code} ${msg}${Eos}`);
+        socket.destroy();
+        proxyRes.resume();
+      })
+      .end();
   }
 }

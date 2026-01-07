@@ -1,5 +1,9 @@
 {
-  "extends": ["@zthun/janitor-ts-config/base", "@zthun/janitor-ts-config/node"],
+  "extends": [
+    "@zthun/janitor-ts-config/base",
+    "@zthun/janitor-ts-config/browser",
+    "@zthun/janitor-ts-config/react"
+  ],
   "compilerOptions": {
     "baseUrl": "packages",
     "paths": {

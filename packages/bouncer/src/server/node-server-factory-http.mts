@@ -29,10 +29,14 @@ export class ZBouncerNodeServerFactoryHttp implements IZBouncerNodeServerFactory
   public async create(): Promise<NodeServerLike> {
     return new Promise((resolve, reject) => {
       const port = firstDefined(80, this._config.port);
-      const http = createServer(this._handler.handle.bind(this._handler))
+      const request = this._handler.handle.bind(this._handler);
+      const upgrade = this._handler.upgrade.bind(this._handler);
+
+      const http = createServer(request)
         .once("error", reject)
         .listen(port, () => {
           http.removeListener("error", reject);
+          http.on("upgrade", upgrade);
           resolve(http);
         });
     });
