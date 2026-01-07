@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.1.0](https://github.com/zthun/bouncer/compare/v4.0.1...v4.1.0) (2026-01-07)
+
+
+### Features
+
+* it is now possible to redirect web sockets ([623d38d](https://github.com/zthun/bouncer/commit/623d38da79b8ea414abe9258d7c50a2ce3f0b539))
+* request handling now supports web sockets ([fcf8c44](https://github.com/zthun/bouncer/commit/fcf8c44f90a9dc77a179f4caa181e117f9f42a41))
+
+
+
 ## [4.0.1](https://github.com/zthun/bouncer/compare/v4.0.0...v4.0.1) (2026-01-04)
 
 **Note:** Version bump only for package @zthun/bouncer
