@@ -124,7 +124,9 @@ export class ZBouncerRequestHandlerForward implements IZBouncerRequestHandler {
       res.statusCode = status;
     }
 
-    res.end();
+    if (!res.writableEnded) {
+      res.end();
+    }
   }
 
   public handle(req: IncomingMessage, res: ServerResponse) {
@@ -148,7 +150,10 @@ export class ZBouncerRequestHandlerForward implements IZBouncerRequestHandler {
         res.writeHead(status, message);
         msg.pipe(res);
         res.on("close", msg.destroy.bind(msg));
-        msg.on("error", this._processError.bind(this, res));
+        msg.on("error", (reason) => {
+          msg.unpipe();
+          this._processError(res, reason);
+        });
       });
 
     if (!NoBodyVerbs.includes(method)) {
