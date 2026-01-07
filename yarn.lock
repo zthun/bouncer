@@ -3729,7 +3729,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@zthun/bouncer-docs@workspace:packages/bouncer-docs"
   dependencies:
-    "@zthun/bouncer": "npm:^4.0.0"
+    "@zthun/bouncer": "npm:^4.1.0"
     typedoc: "npm:^0.28.15"
     typescript: "npm:~5.9.3"
   languageName: unknown
@@ -3757,7 +3757,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@zthun/bouncer@npm:^4.0.0, @zthun/bouncer@workspace:packages/bouncer":
+"@zthun/bouncer@npm:^4.1.0, @zthun/bouncer@workspace:packages/bouncer":
   version: 0.0.0-use.local
   resolution: "@zthun/bouncer@workspace:packages/bouncer"
   dependencies:
