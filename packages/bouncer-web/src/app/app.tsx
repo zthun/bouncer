@@ -5,17 +5,15 @@ import {
   ZRoute,
   ZRouteMap,
 } from "@zthun/fashion-boutique";
-import { createDarkTheme } from "@zthun/fashion-theme";
+import theme from "@zthun/fashion-theme-dark";
 
 import { ZBouncerHome } from "../home/home.js";
 import { ZBouncerAvatar } from "./app-avatar.js";
 import { ZBouncerTitle } from "./app-title.js";
 
-const FashionTheme = createDarkTheme();
-
 export function ZBouncerApp() {
   return (
-    <ZFashionThemeContext.Provider value={FashionTheme}>
+    <ZFashionThemeContext.Provider value={theme}>
       <ZBannerMain
         TitleProps={{
           avatar: <ZBouncerAvatar />,

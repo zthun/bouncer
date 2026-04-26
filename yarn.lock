@@ -3704,9 +3704,10 @@ __metadata:
   dependencies:
     "@zthun/cirque": "npm:^7.2.7"
     "@zthun/cirque-du-react": "npm:^7.2.7"
-    "@zthun/fashion-boutique": "npm:^13.0.5"
-    "@zthun/fashion-tailor": "npm:^13.0.5"
-    "@zthun/fashion-theme": "npm:^13.0.5"
+    "@zthun/fashion-boutique": "npm:^14.0.1"
+    "@zthun/fashion-tailor": "npm:^14.0.1"
+    "@zthun/fashion-theme": "npm:^14.0.1"
+    "@zthun/fashion-theme-dark": "npm:^14.0.1"
     "@zthun/helpful-fn": "npm:^9.11.12"
     "@zthun/helpful-query": "npm:^9.11.12"
     "@zthun/helpful-react": "npm:^9.11.12"
@@ -3770,7 +3771,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@zthun/cirque@npm:^7.2.5, @zthun/cirque@npm:^7.2.7":
+"@zthun/cirque@npm:^7.2.7":
   version: 7.2.7
   resolution: "@zthun/cirque@npm:7.2.7"
   checksum: 10c0/3a80059161b5d140bbd573e73a50dac91af3e6de7fd99cd0b4ac39db511026a6fb1059e6b9b1291faa2204698e415cbc76a00bbd996d746df7cbe8c4c9279657
@@ -3792,55 +3793,64 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@zthun/fashion-boutique@npm:^13.0.5":
-  version: 13.0.5
-  resolution: "@zthun/fashion-boutique@npm:13.0.5"
+"@zthun/fashion-boutique@npm:^14.0.1":
+  version: 14.0.1
+  resolution: "@zthun/fashion-boutique@npm:14.0.1"
   dependencies:
     "@emotion/css": "npm:^11.13.5"
     "@emotion/serialize": "npm:^1.3.3"
     "@emotion/sheet": "npm:^1.4.0"
-    "@zthun/cirque": "npm:^7.2.5"
-    "@zthun/fashion-tailor": "npm:^13.0.5"
-    "@zthun/fashion-theme": "npm:^13.0.5"
-    "@zthun/helpful-fn": "npm:^9.11.10"
-    "@zthun/helpful-query": "npm:^9.11.10"
-    "@zthun/helpful-react": "npm:^9.11.10"
-    "@zthun/webigail-http": "npm:^5.0.5"
-    "@zthun/webigail-url": "npm:^5.0.5"
+    "@zthun/cirque": "npm:^7.2.7"
+    "@zthun/fashion-tailor": "npm:^14.0.1"
+    "@zthun/fashion-theme": "npm:^14.0.1"
+    "@zthun/helpful-fn": "npm:^9.11.12"
+    "@zthun/helpful-query": "npm:^9.11.12"
+    "@zthun/helpful-react": "npm:^9.11.12"
+    "@zthun/webigail-http": "npm:^5.0.7"
+    "@zthun/webigail-url": "npm:^5.0.7"
     csstype: "npm:^3.2.3"
     history: "npm:^5.3.0"
-    lodash-es: "npm:^4.17.23"
-    react-router-dom: "npm:^7.13.0"
-    stylis: "npm:^4.3.6"
+    lodash-es: "npm:^4.18.1"
+    react-router-dom: "npm:^7.14.2"
+    stylis: "npm:^4.4.0"
   peerDependencies:
     react: ^18 || ^19
     react-dom: ^18 || ^19
-  checksum: 10c0/266d57b4fc590d539f4968bdb7d8f1fad713569c012ca274fd36dc57e64614f5571fb142ae60f3c0323fccfd587bd0f87ad8a838528e165e705d79db64d71ccd
+  checksum: 10c0/98dd0fa1be7f4b070d1bbe65d4560a83a6d973a99b27e8ace7781491460e02bebb704b5945e91fa7f0b3cfc1fa47934570b4e908ff075672a74e9a1b99abd290
   languageName: node
   linkType: hard
 
-"@zthun/fashion-tailor@npm:^13.0.5":
-  version: 13.0.5
-  resolution: "@zthun/fashion-tailor@npm:13.0.5"
+"@zthun/fashion-tailor@npm:^14.0.1":
+  version: 14.0.1
+  resolution: "@zthun/fashion-tailor@npm:14.0.1"
   dependencies:
-    "@zthun/helpful-fn": "npm:^9.11.10"
-    lodash-es: "npm:^4.17.23"
-  checksum: 10c0/7176df03018ca7944996df0b2a5327d2194bfd2e82224b16dbf29e01ae9acb6df1129e117b5dd1ee63db46122cfba9094457a516760dafaaf1a4e1b0b9ff12d5
+    "@zthun/helpful-fn": "npm:^9.11.12"
+    lodash-es: "npm:^4.18.1"
+  checksum: 10c0/7a732095f37ef44b7f387c0386108612d0700e53b2e4c88dd49f1a1120445fb9042669cb3c6674a9953bb4e61f5a28d5deeec6026798da1560ff7c04fabf57c7
   languageName: node
   linkType: hard
 
-"@zthun/fashion-theme@npm:^13.0.5":
-  version: 13.0.5
-  resolution: "@zthun/fashion-theme@npm:13.0.5"
+"@zthun/fashion-theme-dark@npm:^14.0.1":
+  version: 14.0.1
+  resolution: "@zthun/fashion-theme-dark@npm:14.0.1"
   dependencies:
-    "@zthun/helpful-fn": "npm:^9.11.10"
+    "@zthun/fashion-theme": "npm:^14.0.1"
+  checksum: 10c0/0d1362f39c6cd4b85270764d474b9b285cadcce49a5baf8e3f56c7825b5d44270e3dd6cb232479e44cd08e42457267c5834011e86d809ce4321e17686633df55
+  languageName: node
+  linkType: hard
+
+"@zthun/fashion-theme@npm:^14.0.1":
+  version: 14.0.1
+  resolution: "@zthun/fashion-theme@npm:14.0.1"
+  dependencies:
+    "@zthun/helpful-fn": "npm:^9.11.12"
     csstype: "npm:^3.2.3"
-    lodash-es: "npm:^4.17.23"
-  checksum: 10c0/7e31c6d1da5bb54a1b69c292d7d0f5477d3ba55a86efc0a69366479b583f607e3b95fd1ebfb7cc436284ee51e232701c68322d716de53d26374d53f53e4c214b
+    lodash-es: "npm:^4.18.1"
+  checksum: 10c0/21ff50b5812f5a73ecc0613309890b74d832f324e7af2dddb180af8f9d76f6a667d90eb531f877abe030443486e31348be19bb74a4279ea8b60cf5d7ef13614f
   languageName: node
   linkType: hard
 
-"@zthun/helpful-fn@npm:^9.11.10, @zthun/helpful-fn@npm:^9.11.12":
+"@zthun/helpful-fn@npm:^9.11.12":
   version: 9.11.12
   resolution: "@zthun/helpful-fn@npm:9.11.12"
   dependencies:
@@ -3851,7 +3861,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@zthun/helpful-query@npm:^9.11.10, @zthun/helpful-query@npm:^9.11.12":
+"@zthun/helpful-query@npm:^9.11.12":
   version: 9.11.12
   resolution: "@zthun/helpful-query@npm:9.11.12"
   dependencies:
@@ -3861,7 +3871,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@zthun/helpful-react@npm:^9.11.10, @zthun/helpful-react@npm:^9.11.12":
+"@zthun/helpful-react@npm:^9.11.12":
   version: 9.11.12
   resolution: "@zthun/helpful-react@npm:9.11.12"
   dependencies:
@@ -3959,18 +3969,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@zthun/webigail-http@npm:^5.0.5":
-  version: 5.0.5
-  resolution: "@zthun/webigail-http@npm:5.0.5"
+"@zthun/webigail-http@npm:^5.0.7":
+  version: 5.0.7
+  resolution: "@zthun/webigail-http@npm:5.0.7"
   dependencies:
-    "@zthun/webigail-url": "npm:^5.0.5"
+    "@zthun/helpful-fn": "npm:^9.11.12"
+    "@zthun/webigail-url": "npm:^5.0.7"
     cross-fetch: "npm:^4.1.0"
-    lodash-es: "npm:^4.17.23"
-  checksum: 10c0/8379614a11067fb148043a0ca0aa42f61def0c1b1eb1444e16f11ca6da00c03e91d296f504dd45683bff698c7a0a0c76f24aa663676678f79878b4d4d0135d79
+    lodash-es: "npm:^4.18.1"
+  checksum: 10c0/7f868238c8fd0cc5cfadd847783b4b32922c53d1236f003f6f805db9d117af7c93b87f3a4d184aa35b4fd3d72b08344c5d89281ce4719048d7e175d51aee972a
   languageName: node
   linkType: hard
 
-"@zthun/webigail-url@npm:^5.0.5, @zthun/webigail-url@npm:^5.0.7":
+"@zthun/webigail-url@npm:^5.0.7":
   version: 5.0.7
   resolution: "@zthun/webigail-url@npm:5.0.7"
   dependencies:
@@ -8352,7 +8363,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lodash-es@npm:^4.17.23, lodash-es@npm:^4.18.1":
+"lodash-es@npm:^4.18.1":
   version: 4.18.1
   resolution: "lodash-es@npm:4.18.1"
   checksum: 10c0/35d4dcf87ef07f8d090f409447575800108057e360b445f590d0d25d09e3d1e33a163d2fc100d4d072b0f901d5e2fc533cd7c4bfd8eeb38a06abec693823c8b8
@@ -10665,21 +10676,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-router-dom@npm:^7.13.0":
-  version: 7.13.0
-  resolution: "react-router-dom@npm:7.13.0"
+"react-router-dom@npm:^7.14.2":
+  version: 7.14.2
+  resolution: "react-router-dom@npm:7.14.2"
   dependencies:
-    react-router: "npm:7.13.0"
+    react-router: "npm:7.14.2"
   peerDependencies:
     react: ">=18"
     react-dom: ">=18"
-  checksum: 10c0/759bd5e7fe7b5baba50a0264724188707682d217cad8eac702a55e0b1abebf295be014dd3bfaff8e3c2def9dfaa23e6ded3f908feab84df766e9b82cc3774e98
+  checksum: 10c0/94b294e7e47247d52358415a4b76e629680485b81bbaa649138b04277580276370f0b380b84bb1ffda21c330ed8c5cb36fb77ba5e173dcaaf06b5bfc44d9ac4e
   languageName: node
   linkType: hard
 
-"react-router@npm:7.13.0":
-  version: 7.13.0
-  resolution: "react-router@npm:7.13.0"
+"react-router@npm:7.14.2":
+  version: 7.14.2
+  resolution: "react-router@npm:7.14.2"
   dependencies:
     cookie: "npm:^1.0.1"
     set-cookie-parser: "npm:^2.6.0"
@@ -10689,7 +10700,7 @@ __metadata:
   peerDependenciesMeta:
     react-dom:
       optional: true
-  checksum: 10c0/397cb009bc83d071269c8f9323bbfe1f856721fde75e39b29fe0ddfe7564ebdc3b8bbb85768321cae92ec28b406e8fac7eab7e232d0738b3b1c092e2764e4307
+  checksum: 10c0/83dc99158ff4c6513f2df358ca0e9920ba836672e491824ff9cf8d2218049db2859fafce147834f5c990cfe516cfdeefb5ffc3f49f917c0b30c2b22697ed96b7
   languageName: node
   linkType: hard
 
@@ -11676,10 +11687,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"stylis@npm:^4.3.6":
-  version: 4.3.6
-  resolution: "stylis@npm:4.3.6"
-  checksum: 10c0/e736d484983a34f7c65d362c67dc79b7bce388054b261c2b7b23d02eaaf280617033f65d44b1ea341854f4331a5074b885668ac8741f98c13a6cfd6443ae85d0
+"stylis@npm:^4.4.0":
+  version: 4.4.0
+  resolution: "stylis@npm:4.4.0"
+  checksum: 10c0/259be096d90dfbfe903c8656dcb7591e52a421e577e950ef42ebd9ca02f387623a1165dd08761492fb6e92a7a562d62a53a694a10b0a2f6dcd7a0db107b4bf55
   languageName: node
   linkType: hard
 

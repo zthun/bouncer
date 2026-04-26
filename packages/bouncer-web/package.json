@@ -21,9 +21,10 @@
   "devDependencies": {
     "@zthun/cirque": "^7.2.7",
     "@zthun/cirque-du-react": "^7.2.7",
-    "@zthun/fashion-boutique": "^13.0.5",
-    "@zthun/fashion-tailor": "^13.0.5",
-    "@zthun/fashion-theme": "^13.0.5",
+    "@zthun/fashion-boutique": "^14.0.1",
+    "@zthun/fashion-tailor": "^14.0.1",
+    "@zthun/fashion-theme": "^14.0.1",
+    "@zthun/fashion-theme-dark": "^14.0.1",
     "@zthun/helpful-fn": "^9.11.12",
     "@zthun/helpful-query": "^9.11.12",
     "@zthun/helpful-react": "^9.11.12",
