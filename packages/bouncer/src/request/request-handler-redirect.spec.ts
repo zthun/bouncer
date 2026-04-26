@@ -1,10 +1,12 @@
-import { ZLoggerSilent } from "@zthun/lumberjacky-log";
 import { request } from "node:http";
 import { connect } from "node:net";
+
+import { ZLoggerSilent } from "@zthun/lumberjacky-log";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
+
 import { ZBouncerConfigServerBuilder } from "../config/config-server.mjs";
 import { ZBouncerNodeServerFactoryHttp } from "../server/node-server-factory-http.mjs";
-import { ZBouncerServer, type IZBouncerServer } from "../server/server.mjs";
+import { type IZBouncerServer, ZBouncerServer } from "../server/server.mjs";
 import { ZBouncerRequestHandlerRedirect } from "./request-handler-redirect.mjs";
 
 describe("Handler Redirect", () => {

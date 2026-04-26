@@ -1,6 +1,8 @@
 import { request as httpRequest } from "node:http";
 import { request as httpsRequest } from "node:https";
+
 import { describe, expect, it, vi } from "vitest";
+
 import { forwardRequest } from "./forward-request.mjs";
 
 vi.mock("node:http");

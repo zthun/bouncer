@@ -1,10 +1,11 @@
 import { ZLoggerSilent } from "@zthun/lumberjacky-log";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
+
 import { ZBouncerCertGeneratorSelfSigned } from "../cert/cert-generator-self-signed.mjs";
 import { ZBouncerConfigServerBuilder } from "../config/config-server.mjs";
 import { ZBouncerRequestHandlerForward } from "../request/request-handler-forward.mjs";
 import { ZBouncerNodeServerFactoryHttps } from "./node-server-factory-https.mjs";
-import { ZBouncerServer, type IZBouncerServer } from "./server.mjs";
+import { type IZBouncerServer, ZBouncerServer } from "./server.mjs";
 
 describe("Https", () => {
   const logger = new ZLoggerSilent();

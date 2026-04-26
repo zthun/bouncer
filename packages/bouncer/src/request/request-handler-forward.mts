@@ -1,10 +1,3 @@
-import { createError, firstDefined, firstTruthy } from "@zthun/helpful-fn";
-import {
-  ZLogEntryBuilder,
-  ZLoggerContext,
-  type IZLogger,
-} from "@zthun/lumberjacky-log";
-import { castArray, get } from "lodash-es";
 import type {
   IncomingHttpHeaders,
   IncomingMessage,
@@ -12,6 +5,15 @@ import type {
   ServerResponse,
 } from "node:http";
 import { type Duplex } from "node:stream";
+
+import { createError, firstDefined, firstTruthy } from "@zthun/helpful-fn";
+import {
+  type IZLogger,
+  ZLogEntryBuilder,
+  ZLoggerContext,
+} from "@zthun/lumberjacky-log";
+import { castArray, get } from "lodash-es";
+
 import type { ZBouncerDomainMap } from "../config/config-server.mjs";
 import { forwardRequest } from "./forward-request.mjs";
 import type { IZBouncerRequestHandler } from "./request-handler.mjs";
@@ -195,7 +197,7 @@ export class ZBouncerRequestHandlerForward implements IZBouncerRequestHandler {
       })
       .on("upgrade", (proxyRes, proxySocket, proxyHead) => {
         const casted = Object.entries(this._castHeaders(proxyRes.headers));
-        const lines = Array.from(casted).map(([k, v]) => `${k}: ${v}`);
+        const lines = Array.from(casted).map(([k, v]) => `${k}: ${String(v)}`);
         const headers = lines.join(Eol);
 
         socket.write(`${Http} ${Switch} ${SwitchMsg}${Eol}${headers}${Eos}`);

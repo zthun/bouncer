@@ -1,12 +1,13 @@
 import type { ZDeepPartial } from "@zthun/helpful-fn";
 import { describe, expect, it } from "vitest";
+
+import type { IZBouncerConfig } from "./config.mjs";
+import { ZBouncerConfigBuilder } from "./config.mjs";
 import { ZBouncerConfigSecurityBuilder } from "./config-security.mjs";
 import {
   ZBouncerConfigServerBuilder,
   ZBouncerConfigServerType,
 } from "./config-server.mjs";
-import type { IZBouncerConfig } from "./config.mjs";
-import { ZBouncerConfigBuilder } from "./config.mjs";
 
 describe("ZBouncerConfig", () => {
   const createTestTarget = () => new ZBouncerConfigBuilder();

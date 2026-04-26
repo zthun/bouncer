@@ -1,5 +1,7 @@
-import { firstDefined } from "@zthun/helpful-fn";
 import { createServer } from "node:http";
+
+import { firstDefined } from "@zthun/helpful-fn";
+
 import type { IZBouncerConfigServer } from "../config/config-server.mjs";
 import type { IZBouncerRequestHandler } from "../request/request-handler.mjs";
 import type {

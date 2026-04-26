@@ -1,11 +1,13 @@
-import { firstDefined, firstTruthy } from "@zthun/helpful-fn";
-import {
-  ZLogEntryBuilder,
-  ZLoggerContext,
-  type IZLogger,
-} from "@zthun/lumberjacky-log";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import type { Duplex } from "node:stream";
+
+import { firstDefined, firstTruthy } from "@zthun/helpful-fn";
+import {
+  type IZLogger,
+  ZLogEntryBuilder,
+  ZLoggerContext,
+} from "@zthun/lumberjacky-log";
+
 import type { IZBouncerRequestHandler } from "./request-handler.mjs";
 import { Eol, Eos, Http, Redirect, RedirectMsg } from "./request-status.mjs";
 

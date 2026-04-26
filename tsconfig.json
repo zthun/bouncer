@@ -5,9 +5,8 @@
     "@zthun/janitor-ts-config/react"
   ],
   "compilerOptions": {
-    "baseUrl": "packages",
     "paths": {
-      "@zthun/bouncer": ["bouncer/src/index.mts"]
+      "@zthun/bouncer": ["./packages/bouncer/src/index.mts"]
     }
   },
   "include": ["**/*.ts", "**/*.mts"]

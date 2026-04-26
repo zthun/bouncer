@@ -1,8 +1,9 @@
 import { firstDefined, type ZDeepPartial } from "@zthun/helpful-fn";
 import { isUndefined, merge, omitBy } from "lodash-es";
+
 import {
-  ZBouncerConfigSecurityBuilder,
   type IZBouncerConfigSecurity,
+  ZBouncerConfigSecurityBuilder,
 } from "./config-security.mjs";
 
 /**

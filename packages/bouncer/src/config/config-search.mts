@@ -1,4 +1,5 @@
 import { cosmiconfig } from "cosmiconfig";
+
 import type { IZBouncerConfig } from "./config.mjs";
 import { ZBouncerConfigBuilder } from "./config.mjs";
 

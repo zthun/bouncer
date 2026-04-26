@@ -1,6 +1,4 @@
-import { firstDefined } from "@zthun/helpful-fn";
-import { ZLoggerSilent } from "@zthun/lumberjacky-log";
-import { ZMimeTypeText, ZUrlBuilder } from "@zthun/webigail-url";
+/* eslint-disable @typescript-eslint/prefer-promise-reject-errors */
 import { createHash, randomBytes } from "node:crypto";
 import type {
   IncomingHttpHeaders,
@@ -13,12 +11,17 @@ import type { RequestOptions } from "node:https";
 import { Agent, request } from "node:https";
 import type { Duplex } from "node:stream";
 import { connect as tlsConnect, type ConnectionOptions } from "node:tls";
+
+import { createError, firstDefined } from "@zthun/helpful-fn";
+import { ZLoggerSilent } from "@zthun/lumberjacky-log";
+import { ZMimeTypeText, ZUrlBuilder } from "@zthun/webigail-url";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
+
 import { ZBouncerCertGeneratorSelfSigned } from "../cert/cert-generator-self-signed.mjs";
 import { ZBouncerConfigServerBuilder } from "../config/config-server.mjs";
 import { ZBouncerRequestHandlerForward } from "../request/request-handler-forward.mjs";
 import { ZBouncerNodeServerFactoryHttps } from "../server/node-server-factory-https.mjs";
-import { ZBouncerServer, type IZBouncerServer } from "../server/server.mjs";
+import { type IZBouncerServer, ZBouncerServer } from "../server/server.mjs";
 
 describe("Handler Forward", () => {
   const logger = new ZLoggerSilent();
@@ -341,9 +344,10 @@ describe("Handler Forward", () => {
           clearTimeout(timeout);
           resolve(value);
         })
-        .catch((err) => {
+        .catch((error) => {
+          const _error = createError(error);
           clearTimeout(timeout);
-          reject(err);
+          reject(_error);
         });
     });
   }
