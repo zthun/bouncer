@@ -1,5 +1,7 @@
-import { firstDefined } from "@zthun/helpful-fn";
 import { createServer } from "node:https";
+
+import { firstDefined } from "@zthun/helpful-fn";
+
 import type { IZBouncerCertGenerator } from "../cert/cert-generator.mjs";
 import type { IZBouncerConfigServer } from "../config/config-server.mjs";
 import type { IZBouncerRequestHandler } from "../request/request-handler.mjs";

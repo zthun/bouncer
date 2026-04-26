@@ -1,8 +1,9 @@
 import { firstDefined, type ZDeepPartial } from "@zthun/helpful-fn";
 import { castArray } from "lodash-es";
+
 import {
-  ZBouncerConfigServerBuilder,
   type IZBouncerConfigServer,
+  ZBouncerConfigServerBuilder,
 } from "./config-server.mjs";
 
 /**

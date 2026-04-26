@@ -1,9 +1,10 @@
 import { ZLoggerSilent } from "@zthun/lumberjacky-log";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
+
 import { ZBouncerConfigServerBuilder } from "../config/config-server.mjs";
 import { ZBouncerRequestHandlerForward } from "../request/request-handler-forward.mjs";
 import { ZBouncerNodeServerFactoryHttp } from "./node-server-factory-http.mjs";
-import { ZBouncerServer, type IZBouncerServer } from "./server.mjs";
+import { type IZBouncerServer, ZBouncerServer } from "./server.mjs";
 
 describe("Http", () => {
   const logger = new ZLoggerSilent();

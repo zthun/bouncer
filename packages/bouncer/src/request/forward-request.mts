@@ -1,7 +1,8 @@
-import { firstTruthy } from "@zthun/helpful-fn";
 import type { ClientRequest, OutgoingHttpHeaders } from "node:http";
 import { request as httpRequest } from "node:http";
 import { request as httpsRequest } from "node:https";
+
+import { firstTruthy } from "@zthun/helpful-fn";
 
 export interface ForwardRequestOptions {
   method?: string;

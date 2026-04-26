@@ -1,9 +1,10 @@
 import { createError } from "@zthun/helpful-fn";
 import {
+  type IZLogger,
   ZLogEntryBuilder,
   ZLoggerContext,
-  type IZLogger,
 } from "@zthun/lumberjacky-log";
+
 import type {
   IZBouncerNodeServerFactory,
   NodeServerLike,
@@ -26,8 +27,8 @@ export class ZBouncerServer implements IZBouncerServer {
     this._log = new ZLoggerContext("ZBouncerServer", log);
   }
 
-  public async running(): Promise<boolean> {
-    return this._server != null;
+  public running(): Promise<boolean> {
+    return Promise.resolve(this._server != null);
   }
 
   public async start(): Promise<void> {

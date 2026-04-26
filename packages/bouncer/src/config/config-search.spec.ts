@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { ZBouncerConfigSearch } from "./config-search.mjs";
+
 import { ZBouncerConfigBuilder } from "./config.mjs";
+import { ZBouncerConfigSearch } from "./config-search.mjs";
 
 describe("ZBouncerConfigSearch", () => {
   const createTestTarget = () => new ZBouncerConfigSearch();
