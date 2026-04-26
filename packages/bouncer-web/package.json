@@ -27,12 +27,12 @@
     "@zthun/helpful-fn": "^9.11.12",
     "@zthun/helpful-query": "^9.11.12",
     "@zthun/helpful-react": "^9.11.12",
-    "@zthun/janitor-build-config": "^19.5.6",
-    "@zthun/janitor-ts-config": "^19.5.3",
+    "@zthun/janitor-build-config": "^20.0.5",
+    "@zthun/janitor-ts-config": "^20.0.4",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
-    "typescript": "~5.9.3",
-    "vite": "^7.3.2",
+    "typescript": "~6.0.3",
+    "vite": "^8.0.10",
     "vitest": "^4.1.5"
   },
   "files": [

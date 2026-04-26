@@ -20,7 +20,7 @@
   "devDependencies": {
     "@zthun/bouncer": "^4.1.1",
     "typedoc": "^0.28.19",
-    "typescript": "~5.9.3"
+    "typescript": "~6.0.3"
   },
   "files": [
     "dist"
