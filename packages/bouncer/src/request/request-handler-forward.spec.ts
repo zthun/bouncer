@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/prefer-promise-reject-errors */
 import { createHash, randomBytes } from "node:crypto";
 import type {
   IncomingHttpHeaders,
@@ -11,7 +12,7 @@ import { Agent, request } from "node:https";
 import type { Duplex } from "node:stream";
 import { connect as tlsConnect, type ConnectionOptions } from "node:tls";
 
-import { firstDefined } from "@zthun/helpful-fn";
+import { createError, firstDefined } from "@zthun/helpful-fn";
 import { ZLoggerSilent } from "@zthun/lumberjacky-log";
 import { ZMimeTypeText, ZUrlBuilder } from "@zthun/webigail-url";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
@@ -343,9 +344,10 @@ describe("Handler Forward", () => {
           clearTimeout(timeout);
           resolve(value);
         })
-        .catch((err) => {
+        .catch((error) => {
+          const _error = createError(error);
           clearTimeout(timeout);
-          reject(err);
+          reject(_error);
         });
     });
   }
