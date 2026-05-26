@@ -28,22 +28,22 @@
     "access": "public"
   },
   "dependencies": {
-    "@zthun/crumbtrail-fs": "^2.4.10",
-    "@zthun/helpful-fn": "^9.11.12",
-    "@zthun/lumberjacky-log": "^4.0.6",
-    "@zthun/webigail-url": "^5.0.7",
+    "@zthun/crumbtrail-fs": "^2.4.11",
+    "@zthun/helpful-fn": "^9.11.13",
+    "@zthun/lumberjacky-log": "^4.0.7",
+    "@zthun/webigail-url": "^5.0.8",
     "cosmiconfig": "^9.0.1",
     "lodash-es": "^4.18.1"
   },
   "devDependencies": {
     "@types/lodash-es": "^4.17.12",
-    "@zthun/janitor-build-config": "^20.0.5",
+    "@zthun/janitor-build-config": "^20.0.6",
     "@zthun/janitor-ts-config": "^20.0.4",
-    "tsx": "^4.21.0",
+    "tsx": "^4.22.3",
     "typedoc": "^0.28.19",
     "typescript": "~6.0.3",
-    "vite": "^8.0.10",
-    "vitest": "^4.1.5"
+    "vite": "^8.0.14",
+    "vitest": "^4.1.7"
   },
   "files": [
     "dist"

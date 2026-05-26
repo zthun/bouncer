@@ -19,22 +19,22 @@
     "access": "public"
   },
   "devDependencies": {
-    "@zthun/cirque": "^7.2.7",
-    "@zthun/cirque-du-react": "^7.2.7",
-    "@zthun/fashion-boutique": "^14.0.1",
-    "@zthun/fashion-tailor": "^14.0.1",
-    "@zthun/fashion-theme": "^14.0.1",
-    "@zthun/fashion-theme-dark": "^14.0.1",
-    "@zthun/helpful-fn": "^9.11.12",
-    "@zthun/helpful-query": "^9.11.12",
-    "@zthun/helpful-react": "^9.11.12",
-    "@zthun/janitor-build-config": "^20.0.5",
+    "@zthun/cirque": "^7.2.8",
+    "@zthun/cirque-du-react": "^7.2.8",
+    "@zthun/fashion-boutique": "^14.0.2",
+    "@zthun/fashion-tailor": "^14.0.2",
+    "@zthun/fashion-theme": "^14.0.2",
+    "@zthun/fashion-theme-dark": "^14.0.2",
+    "@zthun/helpful-fn": "^9.11.13",
+    "@zthun/helpful-query": "^9.11.13",
+    "@zthun/helpful-react": "^9.11.13",
+    "@zthun/janitor-build-config": "^20.0.6",
     "@zthun/janitor-ts-config": "^20.0.4",
-    "react": "^19.2.5",
-    "react-dom": "^19.2.5",
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6",
     "typescript": "~6.0.3",
-    "vite": "^8.0.10",
-    "vitest": "^4.1.5"
+    "vite": "^8.0.14",
+    "vitest": "^4.1.7"
   },
   "files": [
     "dist"
