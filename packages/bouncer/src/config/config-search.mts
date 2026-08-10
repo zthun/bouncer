@@ -9,7 +9,7 @@ export interface IZBouncerConfigSearch {
 
 export class ZBouncerConfigSearch implements IZBouncerConfigSearch {
   public async search(name = "bouncer") {
-    const explorer = cosmiconfig(name, { searchStrategy: "project" });
+    const explorer = cosmiconfig(name, { searchStrategy: "global" });
     const searched = await explorer.search();
     let builder = new ZBouncerConfigBuilder();
 
