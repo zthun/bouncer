@@ -13,7 +13,7 @@ import { ZBouncerTitle } from "./app-title.js";
 
 export function ZBouncerApp() {
   return (
-    <ZFashionThemeContext.Provider value={theme}>
+    <ZFashionThemeContext value={theme}>
       <ZBannerMain
         TitleProps={{
           avatar: <ZBouncerAvatar />,
@@ -25,6 +25,6 @@ export function ZBouncerApp() {
           <ZRoute path="*" element={<ZNotFound />} />
         </ZRouteMap>
       </ZBannerMain>
-    </ZFashionThemeContext.Provider>
+    </ZFashionThemeContext>
   );
 }

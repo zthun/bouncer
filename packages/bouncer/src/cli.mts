@@ -1,4 +1,4 @@
-import { ZLoggerConsole } from "@zthun/lumberjacky-log";
+import { ZLogEntryBuilder, ZLoggerConsole } from "@zthun/lumberjacky-log";
 
 import { ZBouncerCertGeneratorSelfSigned } from "./cert/cert-generator-self-signed.mjs";
 import { ZBouncerConfigSearch } from "./config/config-search.mjs";
@@ -19,6 +19,13 @@ void (async function main() {
   const explorer = new ZBouncerConfigSearch();
   const config = await explorer.search();
   const { servers } = config;
+
+  const entry = new ZLogEntryBuilder()
+    .info()
+    .context("ZBouncerCli")
+    .message(`Initializing ${servers.length} servers`)
+    .build();
+  logger.log(entry);
 
   await Promise.all(
     servers.map((server) => {
