@@ -68,7 +68,7 @@ export class ZBouncerRequestHandlerForward implements IZBouncerRequestHandler {
     const path = `/${normalized}`;
     const query = _query?.length ? `?${_query}` : "";
 
-    for (let cursor = path; ; ) {
+    for (let cursor = path; ;) {
       const mapped = target[cursor];
 
       if (mapped === null) {
