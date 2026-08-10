@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.1.4](https://github.com/zthun/bouncer/compare/v4.1.3...v4.1.4) (2026-08-10)
+
+**Note:** Version bump only for package @zthun/bouncer-web
+
 ## [4.1.3](https://github.com/zthun/bouncer/compare/v4.1.2...v4.1.3) (2026-05-26)
 
 **Note:** Version bump only for package @zthun/bouncer-web
