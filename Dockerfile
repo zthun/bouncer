@@ -31,7 +31,7 @@ RUN --mount=type=secret,id=GIT_CREDENTIALS,dst=/root/.git-credentials npx lerna 
     git push --tags
 RUN --mount=type=secret,id=NPM_CREDENTIALS,dst=/root/.npmrc npx lerna publish from-package --yes
 
-FROM node:lts as bouncer
+FROM node:lts as bouncer-cli
 RUN npm install -g @zthun/bouncer-cli
 EXPOSE 80
 EXPOSE 443
