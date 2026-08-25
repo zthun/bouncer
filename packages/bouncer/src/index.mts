@@ -7,6 +7,8 @@ export * from "./config/config-security.mjs";
 export * from "./config/config-server.mjs";
 export * from "./request/request-handler.mjs";
 export * from "./request/request-handler-forward.mjs";
+export * from "./request/request-handler-redirect.mjs";
 export * from "./server/node-server-factory.mjs";
+export * from "./server/node-server-factory-http.mjs";
 export * from "./server/node-server-factory-https.mjs";
 export * from "./server/server.mjs";

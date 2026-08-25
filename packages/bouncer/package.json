@@ -1,7 +1,7 @@
 {
   "name": "@zthun/bouncer",
   "version": "4.1.4",
-  "description": "A declarative reverse proxy server in nodejs.",
+  "description": "A library that can help to build a declarative proxy server in nodejs.",
   "author": "Anthony Bonta",
   "license": "MIT",
   "type": "module",
@@ -18,11 +18,8 @@
     "import": "./dist/index.js",
     "require": "./dist/index.cjs"
   },
-  "bin": "./bin/cli.mjs",
   "scripts": {
-    "build": "vite build",
-    "debug": "tsx --inspect=0.0.0.0:9229 ./src/cli.mts",
-    "start": "node ./bin/cli.mjs"
+    "build": "vite build"
   },
   "publishConfig": {
     "access": "public"
