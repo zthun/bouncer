@@ -1,6 +1,6 @@
 {
   "name": "@zthun/bouncer-cli",
-  "version": "4.1.4",
+  "version": "5.0.0",
   "description": "A declarative reverse proxy server in nodejs.",
   "author": "Anthony Bonta",
   "license": "MIT",
@@ -20,7 +20,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@zthun/bouncer": "^4.1.4",
+    "@zthun/bouncer": "^5.0.0",
     "@zthun/lumberjacky-log": "^4.0.9"
   },
   "devDependencies": {

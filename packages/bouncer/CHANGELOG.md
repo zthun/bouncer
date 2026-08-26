@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.0.0](https://github.com/zthun/bouncer/compare/v4.1.4...v5.0.0) (2026-08-26)
+
+### Build System
+
+- use new janitor vite plugins ([b089aba](https://github.com/zthun/bouncer/commit/b089aba0f09133b43b9b6502fca20ba0baf5f922))
+
+### BREAKING CHANGES
+
+- bouncer no longer exposes the cli. Use bouncer-cli instead.
+
 ## [4.1.4](https://github.com/zthun/bouncer/compare/v4.1.3...v4.1.4) (2026-08-10)
 
 ### Bug Fixes

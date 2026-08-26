@@ -1,6 +1,6 @@
 {
   "name": "@zthun/bouncer",
-  "version": "4.1.4",
+  "version": "5.0.0",
   "description": "A library that can help to build a declarative proxy server in nodejs.",
   "author": "Anthony Bonta",
   "license": "MIT",
