@@ -1,10 +1,10 @@
 import {
-  ZViteConfigBuilder,
-  ZViteTestBuilder,
-} from "@zthun/janitor-build-config/vite";
+  extensionLibrary,
+  extensionTestSerially,
+  projectNode,
+} from "@zthun/janitor-vite";
 import { defineConfig } from "vite";
 
-const test = new ZViteTestBuilder().node().runSerially().build();
-const config = new ZViteConfigBuilder().cli().test(test).build();
-
-export default defineConfig(config);
+export default defineConfig({
+  plugins: [projectNode(), extensionLibrary(), extensionTestSerially()],
+});
