@@ -25,23 +25,23 @@
     "access": "public"
   },
   "dependencies": {
-    "@zthun/crumbtrail-fs": "^3.0.1",
-    "@zthun/helpful-fn": "^10.0.1",
-    "@zthun/lumberjacky-log": "^4.0.9",
-    "@zthun/webigail-url": "^5.0.11",
-    "cosmiconfig": "^10.0.0",
+    "@zthun/crumbtrail-fs": "^3.0.2",
+    "@zthun/helpful-fn": "^10.0.2",
+    "@zthun/lumberjacky-log": "^4.0.10",
+    "@zthun/webigail-url": "^5.0.12",
+    "cosmiconfig": "^10.0.1",
     "lodash-es": "^4.18.1"
   },
   "devDependencies": {
     "@types/lodash-es": "^4.17.12",
-    "@zthun/janitor-build-config": "^21.1.3",
+    "@zthun/janitor-build-config": "^21.2.4",
     "@zthun/janitor-ts-config": "^21.1.3",
-    "@zthun/janitor-vite": "^21.2.0",
-    "tsx": "^4.23.12",
+    "@zthun/janitor-vite": "^21.2.4",
+    "tsx": "^4.23.15",
     "typedoc": "^0.28.20",
     "typescript": "^6.0.3",
-    "vite": "^8.2.2",
-    "vitest": "^4.1.11"
+    "vite": "^8.3.1",
+    "vitest": "^5.0.3"
   },
   "files": [
     "dist"
