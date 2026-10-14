@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.0.3](https://github.com/zthun/bouncer/compare/v5.0.2...v5.0.3) (2026-10-14)
+
+### Build System
+
+- bouncer-docs is no longer deployed ([cb02915](https://github.com/zthun/bouncer/commit/cb0291535d295aab4f3e712702c05e88d4721ddc))
+
+### BREAKING CHANGES
+
+- bouncer docs is no longer deployed. Use the READMEs instead.
+
 ## [5.0.2](https://github.com/zthun/bouncer/compare/v5.0.1...v5.0.2) (2026-10-01)
 
 **Note:** Version bump only for package bouncer
