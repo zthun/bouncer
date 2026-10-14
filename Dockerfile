@@ -36,9 +36,3 @@ RUN npm install -g @zthun/bouncer-cli
 EXPOSE 80
 EXPOSE 443
 CMD ["bouncer-cli"]
-
-FROM node:lts-alpine as bouncer-web-install
-RUN npm install -g @zthun/bouncer-web
-
-FROM nginx:stable-alpine as bouncer-web
-COPY --from=bouncer-web-install /usr/local/lib/node_modules/@zthun/bouncer-web/dist/. /usr/share/nginx/html/

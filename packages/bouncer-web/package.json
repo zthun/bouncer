@@ -15,9 +15,7 @@
     "build": "vite build",
     "debug": "vite"
   },
-  "publishConfig": {
-    "access": "public"
-  },
+  "private": true,
   "devDependencies": {
     "@zthun/cirque": "^7.2.15",
     "@zthun/cirque-du-react": "^7.2.15",
